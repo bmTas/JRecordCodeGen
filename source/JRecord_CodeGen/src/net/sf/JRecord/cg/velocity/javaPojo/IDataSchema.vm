@@ -1,0 +1,34 @@
+package ${packageId};
+#incl("schema/CommentSchema.pvm")
+
+/**
+  *  This Interface is implemented by Base-Class for the indivual records.
+  *  The as??? method will return the class as a specific record type or null. 
+  *  Only one as??? method  (corresponding to the Record-Type) 
+  *  will return an actual value
+  *
+  *  You can use the <b>generatedRecordType</b> to get the RecordType.
+  *  To process a line read in from a file
+  * <pre>
+  *    switch (line.generatedRecordType()) {
+#foreach( $r in ${generateOptions.schemaDefinition.getRecords()})
+  *       case ${r.className} : process(line.as${r.extensionName});          break;
+#end
+  *    } 
+  * </pre>
+  */
+public interface I${generateOptions.schemaDefinition.extensionName}Schema {
+    /**
+     * Get the Record Type of this record
+     */
+	public Defs${generateOptions.schemaDefinition.extensionName}.Records generatedRecordType();
+	
+#foreach( $r in ${generateOptions.schemaDefinition.getRecords()})
+	/**
+	 * Return either the <b>actual Record</b> or <b>null</b>
+	 * Depending on what record this is.
+	 */
+	public I${r.extensionName}Upd as${r.extensionName}();
+	
+#end
+}

@@ -1,0 +1,14 @@
+package ${generateOptions.packageId}.definitions;
+#incl("schema/CommentSchema.pvm")
+
+/**
+ *  Interface for Record ${currentRecord.cobolName} from
+ * Cobol Copybook  ${generateOptions.schemaDefinition.cobolName}
+ *
+ * There are Getter/Setter methods for the Cobol Fields / Arrays.
+ * The Set method can assign the Values from one Pojo to another 
+ */
+public interface I${currentRecord.extensionName}Pojo extends I${currentRecord.extensionName}Upd, I${currentRecord.extensionName} {
+
+}
+

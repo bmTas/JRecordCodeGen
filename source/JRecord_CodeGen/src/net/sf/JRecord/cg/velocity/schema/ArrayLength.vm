@@ -1,0 +1,118 @@
+#macro (defineArrayLengthConstants)
+#*  *##foreach($a in ${currentRecord.getArraySameSize()}) 
+    private static final int[] LENGTH_${a.get(0).getFirstElement().getConstantName()} = {${a.get(0).getSizesAsString()}};
+#*  *##end	     
+#end	
+#macro (defineArrayLengthMethods)
+#*  *##foreach($a in ${currentRecord.getArraySameSize()}) 
+	
+#*      *##if (${a.get(0).isThereaDependOnArrayField()})	
+	/**
+	 * Get the Array Sizes.
+	 * The following index's are Cobol Occurs depending (variable sized arrays)<ul>
+#*          *##foreach ($od in ${a.get(0).getDependingOnList()})
+#*              *##if (${od.isDependingOnFieldAnArrayField()})	
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().getArrayDefinition().firstElement.javaName}
+#*              *##else
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+#*          *##end
+	 * </ul>
+	 */
+    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int... index) {
+#*          *##foreach ($od in ${a.get(0).getDependingOnList()})
+	    if (index.length == ${od.getArrayIndexNumber()}) {
+#*              *##if (${od.isDependingOnFieldAnArrayField()})	
+#*                  *##set ($sep = "")             
+#*                  *##set ($last =  ${od.getDependingOnField().getArrayIndexDetails().getIndexCount()} - 1)     
+	       return get${od.getDependingOnField().getArrayDefinition().firstElement.extensionName}(#*
+          *##foreach ($ii in [0 .. ${last}])${sep}index[${ii}]#set ($sep = ", ")#end);
+#*              *##else
+	       return get${od.getDependingOnField().extensionName}();
+#*              *##end
+	    }
+	    
+#*          *##end
+        return LENGTH_${a.get(0).getFirstElement().getConstantName()}[index.length];
+    }
+    
+    	/**
+	 * Set the Array Sizes for variable sized arrays (occurs depending). Only 
+	 * the following index's are affected (Cobol Occurs depending (variable sized arrays))<ul>
+#*          *##foreach ($od in ${a.get(0).getDependingOnList()})
+#*              *##if (${od.isDependingOnFieldAnArrayField()})	
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().getArrayDefinition().firstElement.javaName}
+#*              *##else
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+#*          *##end
+	 * </ul>
+	 * @param indexSize the indexs and array size is the last parameter
+	 */
+    public void set${a.get(0).getFirstElement().extensionName}ArrayLength(int... indexSize) {
+#*          *##foreach ($od in ${a.get(0).getDependingOnList()})
+	    if (indexSize.length - 1 == ${od.getArrayIndexNumber()}) {
+#*              *##if (${od.isDependingOnFieldAnArrayField()})	
+#*                  *##set ($last =  ${od.getDependingOnField().getArrayIndexDetails().getIndexCount()} - 1)     
+#*                  *##set ($val =  ${od.getDependingOnField().getArrayIndexDetails().getIndexCount()})     
+###*                  *###set ($val =  indexSize[${od.getDependingOnField().getArrayIndexDetails().getIndexCount()}]")     
+###*                  *##set ($v =  ${od.getDependingOnField().formatSet("${val}")})     
+	       set${od.getDependingOnField().getArrayDefinition().firstElement.extensionName}(#*
+          *##foreach ($ii in [0 .. ${last}])indexSize[${ii}], #end ${od.getDependingOnField().getFieldFormat()} indexSize[${val}]);
+#*              *##else
+	       set${od.getDependingOnField().extensionName}(${od.getDependingOnField().formatSet("indexSize[indexSize.length - 1]")});
+#*              *##end
+	    }
+#*          *##end
+    }
+
+#*      *##else
+	/**
+	 * Get the Array Sizes.
+	 * @param indexNumber index of the array you want to get the size of
+#*          *##if (${a.get(0).isOccursDependingOn()})
+	 * The following index's are Cobol Occurs depending (variable sized arrays)<ul>
+#*              *##foreach ($od in ${a.get(0).getDependingOnList()})
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+	 * </ul>
+#*          *##end
+	 */
+    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int indexNumber) {
+#*          *##if (${a.get(0).isOccursDependingOn()})
+#*              *##foreach ($od in ${a.get(0).getDependingOnList()})
+	    if (indexNumber == ${od.getArrayIndexNumber()}) {
+	       return get${od.getDependingOnField().extensionName}();
+	    }
+	    
+#*              *##end
+#*          *##end
+        return LENGTH_${a.get(0).getFirstElement().getConstantName()}[indexNumber];
+    }
+#*          *##if (${a.get(0).isOccursDependingOn()})
+	
+	/**
+	 * Set the Occurs-Depending (Cobol Variable sized arrays) Array Sizes.
+	 * Only the following index's are affected 
+	 * (Cobol Occurs depending (variable sized arrays))<ul>
+	 * @param indexNumber index of the array you want to get the size of
+	 * The following index's are Cobol Occurs depending (variable sized arrays)<ul>
+#*              *##foreach ($od in ${a.get(0).getDependingOnList()})
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+	 * </ul>
+	 */
+    public void  set${a.get(0).getFirstElement().extensionName}ArrayLength(int indexNumber, int arraySize) {
+#*              *##foreach ($od in ${a.get(0).getDependingOnList()})
+	    
+	    if (indexNumber == ${od.getArrayIndexNumber()}) {
+	       set${od.getDependingOnField().extensionName}(${od.getDependingOnField().formatSet("arraySize")});
+	    }
+#*              *##end
+    }
+#*          *##end
+#*      *##end
+    
+#*  *##end
+	
+#end	

@@ -1,0 +1,64 @@
+package ${generateOptions.packageId}.definitions;
+#incl("schema/CommentSchema.pvm")
+
+#*  *##foreach($imp in ${currentRecord.getImportList()})
+import ${imp};
+#*  *##end
+#foreach($jc in ${currentRecord.getClassImports()})
+import ${jc};
+#end
+
+/**
+#*  *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/DataSchema.vm")})	
+ * This Interface is a read only representation of one Cobol Record type
+ * <b>${currentRecord.cobolName}</b> from COBOL copybook ${generateOptions.schemaDefinition.cobolName}
+#*  *##else	
+ * This Interface is a read only representation of Cobol Record ( <b>${currentRecord.cobolName}</b>)
+ * from the file (copybook  ${generateOptions.schemaDefinition.cobolName}).
+#*  *##end	
+ */
+public interface I${currentRecord.extensionName} {
+
+#*  *##foreach($f in ${currentRecord.getFields()}) 
+#*      *##if (! ${f.isArrayItem()})	
+	/**
+	 *  Get Cobol Field ${f.cobolName} (Position/Length ${f.getPos()}/${f.getLen()})
+	 */
+	public ${f.getJavaType()} get${f.extensionName}();
+#*      *##end
+#*  *##end
+
+#*  *##foreach($a in ${currentRecord.getArrayDetailsList()}) 
+	/**
+	 *  Get Cobol Array Field ${a.getFirstElement().cobolName} Array Sizes: ${a.getSizesAsString()}
+	 */
+    public ${a.getFirstFieldDef().getJavaType()}  get${a.getFirstElement().extensionName}(${a.getIndexParameters()});
+#*  *##end
+	
+
+#*  *##foreach($a in ${currentRecord.getArraySameSize()}) 
+#*      *##if (${a.get(0).isThereaDependOnArrayField()})
+	/**
+	 * Get the Array Sizes.
+	 * The following index's are Cobol Occurs depending (variable sized arrays)<ul>
+#*          *##foreach ($od in ${a.get(0).getDependingOnList()})
+#*              *##if (${od.isDependingOnFieldAnArrayField()})	
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().getArrayDefinition().firstElement.javaName}
+#*              *##else
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+#*          *##end
+	 * </ul>
+	 */
+    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int... index);
+#*      *##else
+	/**
+	 * Get the Array Sizes.
+	 * @param indexNumber index of the array you want to get the size of
+	 */
+    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int indexNumber);
+#*      *##end	
+    
+#*  *##end	
+}
+

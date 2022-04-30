@@ -1,0 +1,76 @@
+package ${generateOptions.packageId}.definitions;
+#incl("schema/CommentSchema.pvm")
+
+#*  *##foreach($imp in ${currentRecord.getImportList()})
+import ${imp};
+#*  *##end
+#foreach($jc in ${currentRecord.getClassImports()})
+import ${jc};
+#end
+
+/**
+#*  *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/DataSchema.vm")})	
+ * This Interface has the update methods for one Cobol Record type
+ * <b>${currentRecord.cobolName}</b> from COBOL copybook ${generateOptions.schemaDefinition.cobolName}
+#*  *##else	
+ * This Interface has the update methods for Cobol Record ( <b>${currentRecord.cobolName}</b>)
+ * from the file (copybook  ${generateOptions.schemaDefinition.cobolName}).
+#*  *##end
+ */
+public interface I${currentRecord.extensionName}Upd {
+
+#*  *##foreach($f in ${currentRecord.getFields()}) 
+#*      *##if (! ${f.isArrayItem()})	
+	/**
+	 *  Set Cobol Field ${f.cobolName} (Position/Length ${f.getPos()}/${f.getLen()}
+	 */
+    public abstract void set${f.extensionName}(${f.getJavaType()} value);
+#*      *##end
+#*  *##end
+
+#*  *##foreach($a in ${currentRecord.getArrayDetailsList()}) 
+ 	/**
+	 *  Set Cobol Array Field ${a.getFirstElement().cobolName} Array Sizes: ${a.getSizesAsString()}
+	 */
+    public abstract void  set${a.getFirstElement().extensionName}(${a.getIndexParameters()}, ${a.getFirstFieldDef().getJavaType()} value);
+#*  *##end
+
+#*  *##foreach($a in ${currentRecord.getArraySameSize()}) 
+#*      *##if (${a.get(0).isThereaDependOnArrayField()})
+	/**
+	 * Get the Array Sizes.
+	 * The following index's are Cobol Occurs depending (variable sized arrays)<ul>
+#*          *##foreach ($od in ${a.get(0).getDependingOnList()})
+#*              *##if (${od.isDependingOnFieldAnArrayField()})	
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().getArrayDefinition().firstElement.javaName}
+#*              *##else
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+#*          *##end
+	 * </ul>
+	 */
+    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int... index);
+#*      *##else
+	/**
+	 * Get the Array Sizes.
+	 * @param indexNumber index of the array you want to get the size of
+#*          *##if (${a.get(0).isOccursDependingOn()})
+	 * The following index's are Cobol Occurs depending (variable sized arrays)<ul>
+#*              *##foreach ($od in ${a.get(0).getDependingOnList()})
+	 *   <li>index=${od.getArrayIndexNumber()},  field=${od.getDependingOnField().javaName}
+#*              *##end
+	 * </ul>
+#*          *##end
+	 */
+    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int indexNumber);
+#*      *##end	
+#*  *##end	
+
+
+	/**
+	 *  Set the values from a Pojo representation of ${currentRecord.cobolName}
+	 *  @param value a pojo representation of ${currentRecord.cobolName}
+	 */
+    public abstract void set(I${currentRecord.extensionName} value);
+}
+
