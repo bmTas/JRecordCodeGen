@@ -1,0 +1,41 @@
+package ${packageId};
+#incl("schema/CommentSchema.pvm")
+
+import java.util.HashMap;
+
+/**
+ * This class defines the various records in the schema in a enum.
+ * There is a method <b>recordFromString</b> to convert the Record name
+ * to the enum
+ */
+public class Defs${generateOptions.schemaDefinition.extensionName} {
+
+	private static final HashMap<String, Records> recordMap = new HashMap<String, Records>();
+	
+	/**
+	 * Enum for all the record Types
+	 */
+    public enum Records {
+#set ($sep = " ")
+#foreach( $r in ${generateOptions.schemaDefinition.getRecords()})
+        ${sep}${r.constantName}("${r.cobolName}")
+#set ($sep = ",")
+#end
+	;		
+
+		private final String recName;
+		Records(String recName) {
+			this.recName = recName;
+			
+			recordMap.put(recName.toLowerCase(), this);
+		}
+	}
+	
+	/**
+	 * Convert the Record name (Cobol Name) to the equivalent enum value
+	 */
+	public static Records recordFromString(String recName) {
+		if (recName == null) { return null;}
+		return recordMap.get(recName.toLowerCase());
+	}
+}

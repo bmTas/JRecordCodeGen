@@ -1,0 +1,231 @@
+package ${packageId};
+## ----------------------------------------------------------------------
+##  Purpose: Create a wrapper around a line 
+##       that provides Gettter/setter for fields  
+##  Author: Bruce Martin
+## ----------------------------------------------------------------------
+
+#incl("schema/CommentSchema.pvm")
+#incl("schema/CommonMacros.vm")
+#incl("schema/ArrayLength.vm")
+
+import java.io.IOException; 
+
+#*  *##foreach($imp in ${currentRecord.getImportList()})
+import ${imp};
+#*  *##end
+	
+#conversionImport($currentRecord)
+
+import net.sf.JRecord.Details.AbstractLine;
+import net.sf.JRecord.Details.BasicLine;
+import net.sf.JRecord.Details.IGetByteData;
+import net.sf.JRecord.Details.CsvLine;
+import net.sf.JRecord.def.IO.builders.INewLineCreator;
+
+#*  *##set ( $overide = "")
+#*  *##set ( $overideSet = "")
+#*  *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/IDataPojo.vm")})
+####if (${generateOptions.getTemplateDtls().getGenerateOption("genpojo")})
+#set ($asPojo = "IAsPojo")
+#if (${generateOptions.getJRecordVersion()} > 815)
+	#set ($asPojo = "IAsPojoSetData")
+import net.sf.JRecord.cgen.defJr.IAsPojoSetData;
+#else
+import net.sf.JRecord.cgen.def.IAsPojo;
+#end		
+import ${generateOptions.packageId}.definitions.I${currentRecord.extensionName};
+import ${generateOptions.packageId}.definitions.I${currentRecord.extensionName}Pojo;  
+
+#*      *##set ( $overide = "@Override")
+#*      *##set ( $overideSet = "@Override")
+
+
+/**
+ *  This is a <i>LineWrapper</i> class COBOL copybook ${generateOptions.schemaDefinition.cobolName}.
+ *  It wraps JRecord Line and supplies access to the Cobol fields
+ */
+## // genpojo : ${generateOptions.getTemplateDtls().getGenerateOption("genpojo")}
+public class Line${currentRecord.extensionName}JR 
+implements I${currentRecord.extensionName}Pojo, IGetByteData, ${asPojo}<Line${currentRecord.extensionName}Pojo> {
+#*  *##elseif (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/IData.vm")})
+#*      *##set ( $overide = "@Override")
+###if (${generateOptions.getJRecordVersion()} > 815)
+##import net.sf.JRecord.cgen.defJr.IAsPojoSetData;
+###else
+##import net.sf.JRecord.cgen.def.IAsPojo;
+###end
+	
+import ${generateOptions.packageId}.definitions.I${currentRecord.extensionName};
+#*      *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/IDataUpdate.vm")})
+#*          *##set ( $overideSet = "@Override")
+import ${generateOptions.packageId}.definitions.I${currentRecord.extensionName}Upd;
+
+
+/**
+ *  This is a <i>LineWrapper</i> class COBOL copybook ${generateOptions.schemaDefinition.cobolName}.
+ *  It wraps JRecord Line and supplies access to the Cobol fields
+ */
+public class Line${currentRecord.extensionName}JR 
+implements I${currentRecord.extensionName}, I${currentRecord.extensionName}Upd, IGetByteData {
+#*      *##else
+	
+public class Line${currentRecord.extensionName}JR 
+implements I${currentRecord.extensionName}, IGetByteData {
+#*      *##end
+#*  *##else
+
+public class Line${currentRecord.extensionName}JR implements IGetByteData {
+#*  *##end
+   
+    private AbstractLine line; 
+
+    //private static FieldNames${generateOptions.schemaDefinition.extensionName}.Record${currentRecord.extensionName} fn
+    //               = FieldNames${generateOptions.schemaDefinition.extensionName}.RECORD_${currentRecord.constantName};
+    private static FieldDefinitions${generateOptions.schemaDefinition.extensionName}.Record${currentRecord.extensionName} fd;
+
+#defineArrayLengthConstants()                   
+###*  *##foreach($a in ${currentRecord.getArraySameSize()}) 
+##    private static int[] LENGTH_${a.get(0).getFirstElement().getConstantName()} = {${a.get(0).getSizesAsString()}};
+###*  *##end		
+
+
+	public  Line${currentRecord.extensionName}JR() {
+		super();
+	}
+
+
+	public  Line${currentRecord.extensionName}JR(AbstractLine line) {
+		super();
+		this.line = line;
+		
+		setFieldDefinition();
+	}
+
+
+	public  Line${currentRecord.extensionName}JR(INewLineCreator lineCreator) throws IOException {
+		super();
+		this.line = lineCreator.newLine();
+		
+		setFieldDefinition();
+	}
+
+
+#*  *##foreach($f in ${currentRecord.getFields()}) 
+#*      *##if (! ${f.isArrayItem()})
+	/**
+	 *  Get Cobol Field ${f.cobolName} (Position/Length ${f.getPos()}/${f.getLen()})
+	 */	
+    ${overide}
+    public ${f.getJavaType()} get${f.extensionName}() {
+        return #convertToJava($f, "line.getFieldValue(fd.${f.javaName})");
+###*          *##if (${f.getJavaType()} == "short")
+##        return (short) line.getFieldValue(fn.${f.javaName}).asInt();                                 
+###*          *##else   
+##        return line.getFieldValue(fn.${f.javaName}).${f.getAsType()}();
+###*          *##end
+    }
+    
+	/**
+	 *  Set Cobol Field ${f.cobolName} (Position/Length ${f.getPos()}/${f.getLen()})
+	 */
+    ${overideSet}                                                                                                               
+    public void set${f.extensionName}(${f.getJavaType()} value) {
+        this.line.getFieldValue(fd.${f.javaName}).set(#convertFromJava($f, "value"));
+    }
+
+#*      *##end
+#*  *##end
+
+#*  *##foreach($a in ${currentRecord.getArrayDetailsList()})
+#*      *##set ($getMethod = "get")
+#*      *##set ( $dimension = ${a.getDimensionCount()})
+#*      *##if (${dimension} > 4)
+#*          *##set ($getMethod = "getFieldName")
+#*      *##end
+	
+	/**
+	 *  Get Cobol Array Field ${a.getFirstElement().cobolName} Array Sizes: ${a.getSizesAsString()}
+	 */
+    ${overide}
+    public ${a.getFirstFieldDef().getJavaType()}  get${a.getFirstElement().extensionName}(${a.getIndexParameters()}) {
+        return #convertToJava(${a.getFirstFieldDef()}, "(line.getFieldValue(fd.${a.getFirstElement().javaName}.${getMethod}(${a.getCallIndexParameters()})))");
+###*          *##if ( ${a.getFirstFieldDef().getJavaType()} == "short")
+##        return (short) (line.getFieldValue(fn.${a.getFirstElement().javaName}.get(${a.getCallIndexParameters()}))).asInt();
+###*          *##else
+##        return (line.getFieldValue(fn.${a.getFirstElement().javaName}.get(${a.getCallIndexParameters()}))).${a.getFirstFieldDef().getAsType()}();
+###*          *##end
+    }
+    
+    
+	/**
+	 *  Get Cobol Array Field ${a.getFirstElement().cobolName} Array Sizes: ${a.getSizesAsString()}
+	 */
+    ${overideSet}
+    public void set${a.getFirstElement().extensionName}(${a.getIndexParameters()}, ${a.getFirstFieldDef().getJavaType()} value) {
+        (line.getFieldValue(fd.${a.getFirstElement().javaName}.${getMethod}(${a.getCallIndexParameters()}))).set(#convertFromJava(${a.getFirstFieldDef()}, "value"));
+    }
+
+#*  *##end
+
+#defineArrayLengthMethods()	  	
+###*  *##foreach($a in ${currentRecord.getArraySameSize()}) 
+##    public int  get${a.get(0).getFirstElement().extensionName}ArrayLength(int indexNumber) {
+##        return LENGTH_${a.get(0).getFirstElement().getConstantName()}[indexNumber];
+##    }
+###*  *##end		
+
+
+    @Override
+    public byte[] getData() {
+        return line.getData();  
+    }
+
+    @Override
+    public void setData(byte[] data) {
+
+        if (line instanceof BasicLine || line instanceof CsvLine) {
+            line.setData(data);
+        } else {
+            throw new RuntimeException("Invalid line for setdata");
+        }
+    }
+    
+    public Line${currentRecord.extensionName}JR setLine(AbstractLine l) {
+    	line = l;
+    	
+    	setFieldDefinition();
+    	
+    	return this;
+    }
+    
+    public AbstractLine getLine() {
+        return line;
+    }
+     
+    private void setFieldDefinition() {
+    	if (fd == null && line != null) {
+    		fd = FieldDefinitions${generateOptions.schemaDefinition.extensionName}.getFields${currentRecord.extensionName}(line.getLayout());
+    	}
+    }
+
+#*  *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/IDataUpdate.vm")})
+###if (${generateOptions.getTemplateDtls().getGenerateOption("genpojo")})	
+    
+    public Line${currentRecord.extensionName}Pojo asPojo() {
+        Line${currentRecord.extensionName}Pojo l = new Line${currentRecord.extensionName}Pojo();
+        l.set(this);
+        return l;
+    }
+#*  *##end
+#*  *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/IData.vm")})
+    
+    public void set(I${currentRecord.extensionName} value) {
+        Code${generateOptions.schemaDefinition.extensionName}
+            .assign${currentRecord.extensionName}(
+                this, value);
+    }
+#*  *##end
+#conversionCode($currentRecord)
+}
+

@@ -1,0 +1,81 @@
+package ${generateOptions.packageId}.data;
+#incl("schema/CommentSchema.pvm")
+
+import java.math.BigDecimal;
+
+import example.codeGen.support.classes.BaseGeneratedLine;
+import example.codeGen.support.classes.FieldBuilder;
+
+import example.codeGen.support.interfaces.ICblField;
+import example.codeGen.support.interfaces.ICblFieldLong;
+
+import net.sf.JRecord.Common.IFieldDetail;
+import net.sf.JRecord.Details.LayoutDetail;
+
+import ${generateOptions.packageId}.schema.FieldNames${generateOptions.schemaDefinition.extensionName};
+
+public class Line${currentRecord.extensionName} extends BaseGeneratedLine {
+
+#*  *##foreach($f in ${currentRecord.getFields()}) 
+#*      *##if (! ${f.isArrayItem()})
+#*          *##if (${f.getFieldDetail().getName().endsWith("-MDT")})
+#*          *##elseif (${f.isNumeric()})
+#*              *##if (${f.getFieldDetail().getDecimal()} > 0)
+	   private ICblField<BigDecimal> fld${f.extensionName};
+#*              *##else
+	   private ICblFieldLong fld${f.extensionName};
+#*              *##end
+#*          *##else
+	   private ICblField<String> fld${f.extensionName};
+#*          *##end
+#*      *##end
+#*  *##end
+
+
+	public  Line${currentRecord.extensionName}(LayoutDetail schema) {
+	    super(schema);
+	
+	    FieldNames${generateOptions.schemaDefinition.extensionName}.Record${currentRecord.extensionName} rec
+                = FieldNames${generateOptions.schemaDefinition.extensionName}.RECORD_${currentRecord.constantName};
+	    FieldBuilder bldr = new FieldBuilder(super.line);
+	    
+#*  *##set ( $lastField = "null" )	
+#*  *##foreach($f in ${currentRecord.getFields()}) 
+#*      *##if (! ${f.isArrayItem()})
+#*          *##if (${f.getFieldDetail().getName().endsWith("-MDT")})
+#*              *##set ( $lastField = "schema.getFieldFromName(rec.${f.javaName})" )	
+#*          *##else
+	   fld${f.extensionName} = bldr.setFields(${lastField}, schema.getFieldFromName(rec.${f.javaName}))
+#*              *##if (${f.isNumeric()})
+#*                  *##if (${f.getFieldDetail().getDecimal()} > 0)
+	                              .decimalField() ;
+#*                  *##else
+	                              .longField();
+#*                  *##end
+#*              *##else
+	                              .stringField();
+#*              *##end
+
+#*              *##set ( $lastField = "null" )	
+#*          *##end
+#*      *##end
+#*  *##end
+	}
+	
+	
+#*  *##foreach($f in ${currentRecord.getFields()}) 
+#*      *##if (! ${f.isArrayItem()})
+#*          *##if (${f.getFieldDetail().getName().endsWith("-MDT")})
+#*          *##elseif (${f.isNumeric()})
+#*              *##if (${f.getFieldDetail().getDecimal()} > 0)
+	   public ICblField<BigDecimal> get${f.extensionName}() { return fld${f.extensionName}; }
+#*              *##else
+	   public ICblFieldLong get${f.extensionName}() { return fld${f.extensionName}; }
+#*              *##end
+#*          *##else
+	   public ICblField<String> get${f.extensionName}() { return fld${f.extensionName}; }
+#*          *##end
+#*      *##end
+#*  *##end
+
+}

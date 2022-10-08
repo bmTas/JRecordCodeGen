@@ -1,0 +1,96 @@
+package ${packageId};
+##${generateOptions.packageId}.schema;
+#incl("schema/CommentFieldName.pvm")
+
+import net.sf.JRecord.Common.IFieldDetail;
+import net.sf.JRecord.Details.LayoutDetail;
+#*  *##set ($toAdd = "yes")
+#*  *##foreach( $r in ${generateOptions.schemaDefinition.getRecords()}) 
+#*      *##if (${r.getArrayDetailsList().size()} > 0)
+#*          *##if (${toAdd} == "yes")
+import net.sf.JRecord.Details.RecordDetail;
+import net.sf.JRecord.Common.FieldDetail;
+
+
+import net.sf.JRecord.${generateOptions.getJRecordPackageId("cgen.impl.array")}.ArrayFieldDefinition;
+#*        *##if (${generateOptions.getJRecordVersion()} < 930)
+import net.sf.JRecord.${generateOptions.getJRecordPackageId("cgen.impl.array")}.ArrayFieldDefinition1;
+#*        *##else
+import net.sf.JRecord.cgen.support.ArrayFieldDefinition1;
+#*        *##end
+import net.sf.JRecord.cgen.def.*;
+#*              *##set ($toAdd = "no")
+#*          *##end
+#*      *##end
+#*  *##end
+
+public class FieldDefinitions${generateOptions.schemaDefinition.extensionName} {
+
+#*  *##set ($schemaDef = ${generateOptions.schemaDefinition})
+#*  *##foreach( $r in ${generateOptions.schemaDefinition.getRecords()}) 
+    public static  Record${r.extensionName} getFields${r.extensionName}(LayoutDetail schema) {
+        return new Record${r.extensionName}(schema);
+    }
+#*  *##end    
+
+#*  *##foreach( $rec in ${generateOptions.schemaDefinition.getRecords()}) 
+    public static class Record${rec.extensionName} {
+#*    *##foreach($f in ${rec.getFields()}) 	
+#*      *##if (! ${f.isArrayItem()})
+       public final IFieldDetail ${f.javaName};
+#*      *##end
+#*    *##end 
+#*    *##if (${rec.getArrayDetailsList().size()} > 0)
+
+   // Array fields follow:	
+#*      *##foreach($a in ${rec.getArrayDetailsList()}) 
+       public final IArray${a.getDimensionString()}Dimension ${a.getFirstElement().javaName};
+#*      *##end   
+
+#*        *##foreach($a in ${rec.getArrayDetailsList()}) 
+       public final ArrayFieldDefinition1 array${a.getFirstElement().extensionName}; 
+#*        *##end
+#*    *##end
+	
+	    public Record${rec.extensionName}(LayoutDetail schema) {
+##            FieldNames${generateOptions.schemaDefinition.extensionName}.Record$rec.extensionName} fn##
+##                   = FieldNames${generateOptions.schemaDefinition.extensionName}.RECORD_$rec.constantName};
+##
+#*    *##foreach($f in ${rec.getFields()})     
+#*      *##if (! ${f.isArrayItem()})
+            ${f.javaName} = schema${f.getFieldLookup()};
+#*      *##end
+#*    *##end 
+#*    *##if (${rec.getArrayDetailsList().size()} > 0)
+            RecordDetail record = schema.getRecord("${rec.getRecord().getRecordName()}");
+
+#*        *##foreach($a in ${rec.getArrayDetailsList()}) 
+            array${a.getFirstElement().extensionName} #*
+##    *# =  new ArrayFieldDefinition1(
+#*    *##if (${generateOptions.getJRecordVersion()} < 900)
+	               record,
+#*    *##end 
+#*      *##set ( $sep = '')
+#*      *##set ( $dimension = ${a.getDimensionCount()})
+                   new int[] {#*
+        *##foreach($count in ${a.getSizes()})#*
+           *##set ($c = ${count} + 1)#*
+       	   *#${sep}${c}#*
+           *##set ($sep = ', ')#*
+        *##end#*      *#},                                                     
+#*      *##set ( $sz =  ${a.getFieldDefs().size()} - 1)       
+                   record.getArrayFields(
+                       (FieldDetail) schema${a.getFirstFieldDef().getFieldLookup()},
+                       "${a.getFirstElement().cobolName}")      
+            );
+            ${a.getFirstElement().javaName} = array${a.getFirstElement().extensionName};
+#*        *##end
+#*    *##end
+	
+	    }	
+    }
+
+
+#*  *##end    
+}
+

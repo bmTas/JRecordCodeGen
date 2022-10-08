@@ -1,0 +1,43 @@
+<body>
+<h2>Template Description</h2>
+<p>This Zip file  contains a <i>CodeGen Template</i> for JRecord version 0.80.
+This will allow you to generate JRecord version 0.80 code in:
+<ul>
+ <li>RecordEditor / ReCsveditor</li>
+ <li>JRecord CodeGen</li>
+</ul>
+
+<h2>Installation</h2>
+<ol>
+<li>Create a CodeGen Template directory.</li>
+<li>Unzip (or copy) the <b>StandardTemplate_JRecord_080</b> directory to the
+directory from step 1.
+</li>
+</ol>
+
+<h2>RecordEditor / ReCsvEditor usage</h2>
+In <a href="https://sourceforge.net/projects/record-editor/">RecordEditor</a> or <a href="https://sourceforge.net/projects/recsveditor/">ReCsvEditor</a>
+<ul>
+ <li>Select <b>Generate &gt.&gt.&gt. Java JRecord Code for Cobol</b></li>
+ <li>Enter the Cobol Copybook and optionally the Cobol Data file. Also <i>Select</i>
+ the <b>Drop copybook names from field names</b> option.
+ <p><img alt="" src="pict/Gen01.png"></p>
+ </li>
+ <li>Enter the <b>StandardTemplate_JRecord_080</b> directory in the <i>template directory</i> field.
+ <p><img alt="" src="pict/Gen02.png"> </p>
+ <li>Hit the next button to generate the template.</li>
+ </ul>
+<h2>Standalone Codegen usage</h2>
+This Template can be used in the Standalone JRecord-CodeGen program
+
+<pre>
+java -jar ../../lib/JRecordCodeGen.jar  ^
+              -TemplateDirectory  StandardTemplate_jrec80 ^
+              -Template           StandardTemplate_JRecord_080 ^
+              -Schema             DTAR027.cbl   ^
+                -FileOrganisation FixedWidth ^
+                -font             cp037 ^
+              -outputDirectory    DTAR027_xBasic
+
+</pre>
+</body>

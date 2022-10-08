@@ -1,0 +1,142 @@
+<body>
+<h2>Summary of Generate options</h2>
+<table>
+<tr><td>
+<tr><td>Generated on</td><td><b>9.Jun.2001 0:0:0</b></td></tr>
+<tr><td>from Copybook</td><td><b>amsPoDownload.cbl</b></td></tr>
+<tr><td>Template</td><td><b>lineWrapperPojo</b></td></tr>
+<tr><td>Split</td><td><b>01</b></td></tr>
+<tr><td> File Organization</td><td><b>Text</b></td></tr>
+<tr><td>Font</td><td><b></b></td></tr>
+</table>
+<h2>Structure of the Generated Code</h2>
+<p>This code was generated using the <b>lineWrapperPojo</b> Template. This template generates, an Interface(with Getter/setter methods for the Cobol fields)
+for each Cobol Record. This interface has 2 implementing classes:<ul>
+ <li>One (<b>JR</b>) is implemented as a wrapper around a <b>JRecord</b> line class. This class has 2 methods
+ <b>toPojo</b> and <b>set</b> to convert to/from the equivalent pojo class.</li>
+ <li>The other (<b>Pojo</b>) is implemented with standard java classes. It does not reference JRecord.
+</ul>
+<p>For DTAR020 you would get:
+<pre>
+
+       <b>Interface                    Implementing class</b>
+       
+                             +---- <b>LineDtar020JR</b>      - DTAR020 implemented as a wrapper around a
+                             |     |           ^        JRecord Line 
+                             |     | <b>toPojo()</b>  | <b>set(ILineDtar020 dtar020)</b>
+     <b>ILineDtar020Upd</b>    -----+     |           |                   
+                             |     |           |
+                             |     V           | 
+                             +---- <b>LineDtar020Pojo</b>    - Dtar020 implemented using standard java
+                                                        types, it does not reference JRecord
+
+</pre> 
+<p>In general (where ${RecordName} is the record name) you get:</p> 
+<pre>
+
+ Basically for each Cobol Record the following is generated
+
+       <b>Interface                    Implementing class</b>
+       
+                             +---- <b>Line${RecordName}JR</b>      - Implemented as a wrapper around a
+                             |       |             ^          JRecord Line 
+                             |       | <b>toPojo()</b>    | <b>set(...)</b>
+  <b>ILine${RecordName}Upd</b> -----+       |             |                   
+                             |       |             |
+                             |       V             | 
+                             +---- <b>Line${RecordName}Pojo</b>    - Implemented using standard java
+                                                              types, it does not reference JRecord
+
+</pre> 
+
+
+<p>The <b>toPojo</b> and <b>set</b> of <b>Line${RecordName}JR</b> can be used
+to convert one line into the other. There are other classes like the sample read and write 
+programs but the <b>Line</b> interfaces/classes are crucial.
+<p><b>Note:</b> ${RecordName} is the Record name, there will be ILine... Line...JR/Pojo generated for each
+record type in the file.
+<h2>ReadAmspodownload and WriteAmspodownload programs</h2>
+<p>The <a href="lineWrapperPojo/amsPoDownload/example/ReadAmspodownload.java">ReadAmspodownload.java</a>
+and <a href="lineWrapperPojo/amsPoDownload/example/WriteAmspodownload.java">WriteAmspodownload.java</a>
+programs are sample read / write programs. They are not intended to be useful in them selves (they might not compile).
+They are intended to serve as a <b>base</b> from which you can <b>build upon</b>.
+<h2>IPoRecordPojo Interface</h2>
+<p>The <a href="lineWrapperPojo/amsPoDownload/def/IPoRecordPojo.java">IPoRecordPojo</a> Interface
+has get.../set... methods for all the Cobol fields in the PoRecord Record Definition. 
+The Interface <a href="lineWrapperPojo/amsPoDownload/def/IPoRecordPojo.java">IPoRecordPojo</a> is <b>implemented</b> by 2 classes:
+<ul>
+ <li><a href="lineWrapperPojo/amsPoDownload/data/LinePoRecordJR.java">LinePoRecordJR.java</a> is Wrapper for a standard <i>JRecord Line</i> with the appropriate Getter/setter methods.
+Behind the scenes it call the line.getFieldValue(..) ... methods to get/retrieve the values. There are the 2 other Methods for converting to/from a  <b>LinePoRecordPojo</b>:
+  <ul>
+    <li><b>toPojo()</b> method which converts this line into a <b>LinePoRecordPojo</b> class.
+    <li><b>set(IPoRecord value)</b> which will update the line with the values from a  <b>LinePoRecordPojo</b> line.
+  </ul>
+ <li><a href="lineWrapperPojo/amsPoDownload/data/LinePoRecordPojo.java">LinePoRecordPojo.java</a> implments the Interface using standard java types. It does not use or reference JRecord.
+</ul>
+
+<p>The <a href="lineWrapperPojo/amsPoDownload/def/IPoRecordPojo.java">IPoRecordPojo</a> Interface extends 2 other interfaces:<ul>
+<li>The <a href="lineWrapperPojo/amsPoDownload/def/IPoRecord.java">IPoRecord</a> Interface defines the
+get... methods.
+<li>The <a href="lineWrapperPojo/amsPoDownload/def/IPoRecordUpd.java">IPoRecordUpd</a> Interface defines the
+set... methods.
+</ul>
+
+<p>Finally there is the <a href="lineWrapperPojo/amsPoDownload/data/CodeAmspodownload.java">Code.java</a> class that has methods to copy between to classes that implement the  
+<a href="lineWrapperPojo/amsPoDownload/def/IPoRecordPojo.java">IPoRecordPojo</a> interface.
+<h2>IProductRecordPojo Interface</h2>
+<p>The <a href="lineWrapperPojo/amsPoDownload/def/IProductRecordPojo.java">IProductRecordPojo</a> Interface
+has get.../set... methods for all the Cobol fields in the ProductRecord Record Definition. 
+The Interface <a href="lineWrapperPojo/amsPoDownload/def/IProductRecordPojo.java">IProductRecordPojo</a> is <b>implemented</b> by 2 classes:
+<ul>
+ <li><a href="lineWrapperPojo/amsPoDownload/data/LineProductRecordJR.java">LineProductRecordJR.java</a> is Wrapper for a standard <i>JRecord Line</i> with the appropriate Getter/setter methods.
+Behind the scenes it call the line.getFieldValue(..) ... methods to get/retrieve the values. There are the 2 other Methods for converting to/from a  <b>LineProductRecordPojo</b>:
+  <ul>
+    <li><b>toPojo()</b> method which converts this line into a <b>LineProductRecordPojo</b> class.
+    <li><b>set(IProductRecord value)</b> which will update the line with the values from a  <b>LineProductRecordPojo</b> line.
+  </ul>
+ <li><a href="lineWrapperPojo/amsPoDownload/data/LineProductRecordPojo.java">LineProductRecordPojo.java</a> implments the Interface using standard java types. It does not use or reference JRecord.
+</ul>
+
+<p>The <a href="lineWrapperPojo/amsPoDownload/def/IProductRecordPojo.java">IProductRecordPojo</a> Interface extends 2 other interfaces:<ul>
+<li>The <a href="lineWrapperPojo/amsPoDownload/def/IProductRecord.java">IProductRecord</a> Interface defines the
+get... methods.
+<li>The <a href="lineWrapperPojo/amsPoDownload/def/IProductRecordUpd.java">IProductRecordUpd</a> Interface defines the
+set... methods.
+</ul>
+
+<p>Finally there is the <a href="lineWrapperPojo/amsPoDownload/data/CodeAmspodownload.java">Code.java</a> class that has methods to copy between to classes that implement the  
+<a href="lineWrapperPojo/amsPoDownload/def/IProductRecordPojo.java">IProductRecordPojo</a> interface.
+<h2>ILocationRecordPojo Interface</h2>
+<p>The <a href="lineWrapperPojo/amsPoDownload/def/ILocationRecordPojo.java">ILocationRecordPojo</a> Interface
+has get.../set... methods for all the Cobol fields in the LocationRecord Record Definition. 
+The Interface <a href="lineWrapperPojo/amsPoDownload/def/ILocationRecordPojo.java">ILocationRecordPojo</a> is <b>implemented</b> by 2 classes:
+<ul>
+ <li><a href="lineWrapperPojo/amsPoDownload/data/LineLocationRecordJR.java">LineLocationRecordJR.java</a> is Wrapper for a standard <i>JRecord Line</i> with the appropriate Getter/setter methods.
+Behind the scenes it call the line.getFieldValue(..) ... methods to get/retrieve the values. There are the 2 other Methods for converting to/from a  <b>LineLocationRecordPojo</b>:
+  <ul>
+    <li><b>toPojo()</b> method which converts this line into a <b>LineLocationRecordPojo</b> class.
+    <li><b>set(ILocationRecord value)</b> which will update the line with the values from a  <b>LineLocationRecordPojo</b> line.
+  </ul>
+ <li><a href="lineWrapperPojo/amsPoDownload/data/LineLocationRecordPojo.java">LineLocationRecordPojo.java</a> implments the Interface using standard java types. It does not use or reference JRecord.
+</ul>
+
+<p>The <a href="lineWrapperPojo/amsPoDownload/def/ILocationRecordPojo.java">ILocationRecordPojo</a> Interface extends 2 other interfaces:<ul>
+<li>The <a href="lineWrapperPojo/amsPoDownload/def/ILocationRecord.java">ILocationRecord</a> Interface defines the
+get... methods.
+<li>The <a href="lineWrapperPojo/amsPoDownload/def/ILocationRecordUpd.java">ILocationRecordUpd</a> Interface defines the
+set... methods.
+</ul>
+
+<p>Finally there is the <a href="lineWrapperPojo/amsPoDownload/data/CodeAmspodownload.java">Code.java</a> class that has methods to copy between to classes that implement the  
+<a href="lineWrapperPojo/amsPoDownload/def/ILocationRecordPojo.java">ILocationRecordPojo</a> interface.
+<h2>Other Generated classes</h2>
+<p>There are 2 other classes:</p>
+<table>
+ <tr><td><a href="lineWrapperPojo/amsPoDownload/data/FieldNamesAmspodownload.java">FieldNamesAmspodownload</a></td>
+     <td>The is a static constant for each record
+                and each record-constant has all the fields defined</td</tr>
+ <tr><td><a href="lineWrapperPojo/amsPoDownload/data/CodeAmspodownload.java">CodeAmspodownload</a></td>
+ <td>Contains code to assign (copy the values from) a IPoRecord to a class that implements IPoRecordPojo.
+</table                
+
+</body>

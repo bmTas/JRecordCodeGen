@@ -1,0 +1,65 @@
+## CodeGen Templates
+
+A codeGen Template is a directory with
+
+* **Generate.properties** control file
+* An Xml file listing the Velocity templates and there output names
+* One or more Velocity templates
+
+## Mdt Template
+
+The MDT template is for Cobol copybooks where every logical field consists of
+2 logical fields:
+
+* A Mdt field that indicates if the Field is present
+* The Data field
+
+So in the *AAA-MDT* is the flag indicates if the **AAA** is present or not
+
+~~~cobol
+         20  AAA-MDT     PIC X(01).
+         20  AAA         PIC X(03).
+         20  BBB-MDT     PIC X(01).
+         20  BBB         PIC X(03).
+~~~
+
+The *Mdt Template* generates a "field* for each logical field.
+The above will generate
+
+
+~~~java
+    public IStringField getAAA() { ... }
+    public IStringField getBBB() { ... }
+~~~
+
+## Mdt Template principles
+
+One of the principles is to keep the *Velocity Templates* as simple as possible and move as much
+code as possible into support classes.
+The Support code is in the [SupportJavaSource](SupportJavaSource) directory
+
+## Support Code
+
+Some important classes
+
+## Generating using the RecordEditor
+
+* Select the **Generate >>> Java JRecord code for Cobol** Option
+* Select the Cobol copybook and click the **Generte JRecord Button**
+* Enter the directory holding the template directories. So if directory structure is
+**/MyTemplates/MdtTemplate** you would enter **MyTemplates** in this field and the **MdtTemplate** + any other Template directories
+in the *MyTemplates* will be listed in the Template Combo box below it.
+
+## Generating CodeGen
+
+if you download the standalone version of [CodeGen](https://sourceforge.net/projects/jrecord/files/jrecord_CodeGen/)
+you can generate the skel using bat/shell script:
+
+~~~bat
+java -jar ../lib/JRecordCodeGen.jar  ^
+              -TemplateDirectory  CodeGenExample ^
+              -Template           MdtTemplate ^
+              -Schema             LKSA310I_Opp101_RequestFormat.cbl  ^
+              -Package            MdtTest.code  ^
+              -outputDirectory    MdtOut
+~~~

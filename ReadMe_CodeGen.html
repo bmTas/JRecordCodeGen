@@ -1,0 +1,1029 @@
+<body>
+ <h1>JRecord CodeGen</h1>
+ <ul>
+   <li><a href="#Summary">Summary</a></li>
+   <li><a href="#CallCodeGen">CodeGen Template interface</a><ul>  
+      <li><a href="#JavaInterface">Java Interface</a></li>
+      <li><a href="#multirecord">Multi Record Example</a></li>
+      <li><a href="#RenameFields">Renaming duplicate fields</a></li>
+      <li><a href="#java11">Running Java from the shell</a></li>
+      <li><a href="#CodeGenBatch">CodeGen Batch Interface</a></li>
+   </ul></li>
+   <li><a href="#walker">CodeGen Walker Interface</a><ul>
+   	 <li><a href="#stdwalker">Standard Walker Interface</a></li>
+   	 </ul></li>
+   <li><a href="#template">CodeGen Templates</a><ul>   
+     <li><a href="#standard">Standard CodeGen Template</a></li>
+     <li><a href="#lineWrapper">Line Wrapper Template</a></li>
+     <li><a href="#lineWrapperPojo">lineWrapperPojo Template</a></li>
+     <li><a href="#pojo">Pojo Template</a></li>
+     <li><a href="#Other">Other Templates</a></li>
+   </ul></li>
+   <li><a href="#userTemplates">User Written CodeGen Templates</a><ul>
+     <li><a href="#codeGenTemplate">What is a CodeGen Template</a></li>
+     <li><a href="#velocitySkel">Velocity Template</a></li>
+     <li><a href="#SampleVT">Sample Velocity template</a></li>
+   </ul></li>
+   <li><a href="#Parameters">CodeGen Batch Parameters</a></li>
+   <li><a href="#changes">Changes</a></li>
+ </ul>
+ <h2><a id="Summary">Summary</a></h2>
+ <br/><b>Purpose:</b> Generate <font color="blue">Java~JRecord</font> code to Read/Write <font color="green">Cobol Data files</font> using a <font color="blue">Cobol Copybook</font> in java.
+ <br/><b>License:</b> GPL
+ <br/><b>Queries:</b> Use the <a href="https://sourceforge.net/p/jrecord/discussion/">JRecord Forums</a>.
+ <br/><b>Problems:</b> Use either the <a href="https://sourceforge.net/p/jrecord/discussion/">JRecord Forums</a> or <a href="https://sourceforge.net/p/jrecord/_list/tickets/">JRecord Tickets</a>.
+ <br/>
+ <br/><b>Future:</b> Future development will be based on the level of interest / feedback. So if you find this program is
+ useful to you, please <font color="blue">Let me know !!!, provide feedback and get involved !!!</font> also documentation would be useful.
+<p>Changes in this release include:
+ <ul>
+   <li>Adding Java interface.</li>
+   <li>Adding file Analysis to work out file attributes from a sample file.</li>
+   <li>Adding <i>Schema Walker</i> to allow user to generate there own code using just java.
+</ul>
+
+<h2><a id="CallCodeGen">CodeGen Template interface</a></h2>
+
+<h3><a id="JavaInterface">Java Interface</a></h3>
+<p>There is a builder style interface to CodeGen. In the following example, the <b>analyseDataFileSetAttributes</b> codegen to try and determine file
+attributes from the sample data file.
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066"> 5 </font></span>        CodeGenInterface.TEMPLATES.<font color="#9966ff">newTempateBuilder</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">.</font><font color="#ff00cc">cbl</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 6 </font></span>                .<font color="#9966ff">setDataFile</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">.</font><font color="#ff00cc">bin</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 7 </font></span>                .<font color="#9966ff">analyseDataFileSetAttributes</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span>                .<font color="#9966ff">setTemplate</font><font color="#000000"><strong>(</strong></font>StandardTemplates.STANDARD<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>                .<font color="#9966ff">setPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">dtar020</font><font color="#ff00cc">.</font><font color="#ff00cc">standard</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>                .<font color="#9966ff">setOutputDirectory</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">G</font><font color="#ff00cc">:</font><font color="#6600cc">\\</font><font color="#ff00cc">Temp</font><font color="#6600cc">\\</font><font color="#ff00cc">Gen</font><font color="#6600cc">\\</font><font color="#ff00cc">TestCodeGen</font><font color="#6600cc">\\</font><font color="#ff00cc">dtar020</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span>                .<font color="#9966ff">generateJava</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>                .<font color="#9966ff">writeTemplateBuilderCode</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">build</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>; 
+</font></pre>
+
+In this example, CodeGen will try and workout the <i>File Attributes</i> from a sample 
+data file (methods <b>setDataFile</b> and <b>analyseDataFileSetAttributes</b>).
+
+The main Template methods are:<ul>
+  <li><b>setDataFile</b> method defines a data file to be analyzed by CodeGen. The <b>analyseDataFileSetAttributes</b>
+and <b>createRecordDecider</b></li>
+  <li><b>analyseDataFileSetAttributes</b> method tells CodeGen to analyze the sample file (from <b>setDataFile</b> method)
+  and work out the file encoding and file-organisation.</li>
+  <li><b>createRecordDecider</b> method tells CodeGen to analyse the sample file (from <b>setDataFile</b> method)
+  and create a <i>Record-Decider</i>. This only makes sense for a <i>multi-record file</i>.</li>
+  <li><b>setTemplate</b> - define the template to be generated:<ul>
+     <li><i>StandardTemplates.STANDARD</i> - creates a basic Java/JRecord programs to read / write the file.</li>
+     <li><i>StandardTemplates.POJO</i> - creates a java pojo and code to convert it to/from Cobol-Data. 
+     The generated POJO has no reference JRecord.</li>
+     <li><i>StandardTemplates.POJO_INTERFACE</i> - same as the <i>POJO</i> template but with the addition of Interfaces</li>
+     <li><i>StandardTemplates.LINE_WRAPPER</i> - create a class to <b>wrap</b> a JRecord line and proved get/set methods for the fields.</li>
+  </ul>
+  <li><b>setFileOrganisation</b> Set the file organization or structure, This option is also set by the setDataFile/analyseDataFileSetAttributes/. 
+  Options include:<ul>
+     <li><i>FileOrganisation.TEXT</i> - Standard Windows/Linux text file</li>                             
+     <li><i>FileOrganisation.FIXED_LENGTH</i> - All records (lines) have a standard Fixed length. There is no line seperator between records.</li>
+     <li><i>FileOrganisation.MAINFRAME_VB</i> - mainframe VB file</li> 
+  </ul></li>
+  <li><b>setFont</b> - set the encoding/font</li>
+  <li><b>setCopybookSplitOption</b> Tell CodeGen if/how to split a Cobol-Copybook into multiple records.
+  Options are:<ul>
+    <li><i>CopybookSplit.SPLIT_NONE</i> - Single record file, the copybook represents one record.</li>
+    <li><i>CopybookSplit.SPLIT_01_LEVEL</i> - split the copybook into seperate records via the 01 level (a record for each 01 level)</li>
+    <li><i>CopybookSplit.SPLIT_REDEFINE</i> - split the copybook on a redefine</li>
+  </ul>
+ <li><b>setRenameDuplicateFields</b> - rename fields to ensure no duplicates.</li>
+ <li><b>setPackageName</b> - define the package name of the generated code.</li>       
+ <li><b>setOutputDirectory</b> - set the directory where the generated code is to be written to.</li>
+ <li><b>generateJava</b> - Generate Java Code.</li>
+ 
+</ul>  
+
+
+
+
+<h3><a id="multirecord">Multi Record Example</a></h2>
+
+<p>In the following example<ul>
+ <li>The <b>setDataFile</b> defines a sample data file. This is used to 
+ work out file attributes and Record-type attributes.</li>
+ <li>If you want CodeGen to work out the file attributes from a sample file use the <b>analyseDataFileSetAttributes</b> method.</li>
+ <li>The <b>createRecordDecider</b> tells CodeGen to try and create a <i>record mapping</i> from the Cobol Data to one
+of the records in the Cobol Copybook. There is no guarantee the system will succeed though.</li>
+</ul>
+</p>
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 3 </font></span>        CodeGenInterface.TEMPLATES.<font color="#9966ff">newTempateBuilder</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">amsPoDownload</font><font color="#ff00cc">.</font><font color="#ff00cc">cbl</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 4 </font></span>                .<font color="#9966ff">setDataFile</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">/</font><font color="#ff00cc">home</font><font color="#ff00cc">/</font><font color="#ff00cc">bruce</font><font color="#ff00cc">/</font><font color="#ff00cc">.</font><font color="#ff00cc">RecordEditor</font><font color="#ff00cc">/</font><font color="#ff00cc">HSQLDB</font><font color="#ff00cc">/</font><font color="#ff00cc">SampleFiles</font><font color="#ff00cc">/</font><font color="#ff00cc">Ams_PODownload_20041231</font><font color="#ff00cc">.</font><font color="#ff00cc">txt</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066"> 5 </font></span>                .<font color="#9966ff">setCopybookSplitOption</font><font color="#000000"><strong>(</strong></font>CopybookSplit.SPLIT_01_LEVEL<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 6 </font></span>                .<font color="#9966ff">analyseDataFileSetAttributes</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 7 </font></span>                .<font color="#9966ff">createRecordDecider</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span>                .<font color="#9966ff">setTemplate</font><font color="#000000"><strong>(</strong></font>StandardTemplates.POJO<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>                .<font color="#9966ff">setPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">amsPoDownload</font><font color="#ff00cc">.</font><font color="#ff00cc">pojo</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>                .<font color="#9966ff">setOutputDirectory</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">/</font><font color="#ff00cc">home</font><font color="#ff00cc">/</font><font color="#ff00cc">bruce</font><font color="#ff00cc">/</font><font color="#ff00cc">work</font><font color="#ff00cc">/</font><font color="#ff00cc">temp</font><font color="#ff00cc">/</font><font color="#ff00cc">codeGenJavaInterface</font><font color="#ff00cc">/</font><font color="#ff00cc">amsPoDownload</font><font color="#ff00cc">/</font><font color="#ff00cc">v1</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span>                .<font color="#9966ff">generateJava</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>                .<font color="#9966ff">writeTemplateBuilderCode</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">build</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>;
+</font></pre>
+
+or with all attributes hard coded
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">34 </font></span>        ISingleFieldDecider deciderDescription <font color="#000000"><strong>=</strong></font> JRecordInterface1.RECORD_DECIDER_BUILDER
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span>                .<font color="#9966ff">singleFieldDeciderBuilder</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">Record</font><font color="#ff00cc">-</font><font color="#ff00cc">Type</font><font color="#ff00cc">&quot;</font>, <font color="#cc00cc">false</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span>                    .<font color="#9966ff">addRecord</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">h1</font><font color="#ff00cc">&quot;</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">PO</font><font color="#ff00cc">-</font><font color="#ff00cc">Record</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>                    .<font color="#9966ff">addRecord</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">d1</font><font color="#ff00cc">&quot;</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">Product</font><font color="#ff00cc">-</font><font color="#ff00cc">Record</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>                    .<font color="#9966ff">addRecord</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">s1</font><font color="#ff00cc">&quot;</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">Location</font><font color="#ff00cc">-</font><font color="#ff00cc">Record</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>                .<font color="#9966ff">build</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>        CodeGenInterface.TEMPLATES.<font color="#9966ff">newTempateBuilder</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">amsPoDownload</font><font color="#ff00cc">.</font><font color="#ff00cc">cbl</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span>            .<font color="#9966ff">setCobolDialect</font><font color="#000000"><strong>(</strong></font>CobolDialects.MAINFRAME<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span>            .<font color="#9966ff">setFileOrganisation</font><font color="#000000"><strong>(</strong></font>FileOrganisation.TEXT<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">45 </font></span>            .<font color="#9966ff">setCopybookSplitOption</font><font color="#000000"><strong>(</strong></font>CopybookSplit.SPLIT_01_LEVEL<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">46 </font></span>            .<font color="#9966ff">addRecordDecider</font><font color="#000000"><strong>(</strong></font>deciderDescription<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">47 </font></span>            .<font color="#9966ff">setTemplate</font><font color="#000000"><strong>(</strong></font>StandardTemplates.POJO<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">48 </font></span>            .<font color="#9966ff">setPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">amsPoDownload</font><font color="#ff00cc">.</font><font color="#ff00cc">pojo</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">49 </font></span>            .<font color="#9966ff">setOutputDirectory</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">G</font><font color="#ff00cc">:</font><font color="#6600cc">\\</font><font color="#ff00cc">Temp</font><font color="#6600cc">\\</font><font color="#ff00cc">CodeGen</font><font color="#6600cc">\\</font><font color="#ff00cc">amspo</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">50 </font></span>            .<font color="#9966ff">generateJava</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+</font></pre>
+
+<h3><a id="RenameFields">Renaming duplicate fields</a></h3>
+
+<p>JRecord `flattens` Cobol groups to create a single/multiple records. This can 
+lead to duplicate <i>field-names</i>. The <b>setRenameDuplicateFields(true)</b>
+tells JRecord to rename duplicate fields to ensure all fields are unique.</p>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">30 </font></span>        CodeGenInterface.TEMPLATES.<font color="#9966ff">newTempateBuilder</font><font color="#000000"><strong>(</strong></font>iob<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">31 </font></span>                .<font color="#9966ff">setRenameDuplicateFields</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">true</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">32 </font></span>                .<font color="#9966ff">setPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">tstr</font><font color="#ff00cc">.</font><font color="#ff00cc">pojo</font><font color="#ff00cc">.</font><font color="#ff00cc">rename</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+</font></pre>
+
+
+<h3><a id="java11">Running Java from the shell</a></h3>
+<p>As of  <b>java 11</b> you can compile and run java programs from the command line. See <a href="CodeGenExampleJava/template">CodeGenExampleJava/template</a>
+for examples.
+
+<p>In Linux Shell you can do:
+<pre>
+    ./runJavaCodeGen.sh DTAR020.cbl
+</pre></p>
+
+<p>In Windows you can do:
+<pre>
+    runJavaCodeGen DTAR020.cbl
+</pre></p>
+
+<h3><a id="CodeGenBatch">CodeGen Batch Interface</a></h3>
+<pre>
+
+  java -jar ../../lib/JRecordCodeGen.jar  ^
+               <font color="blue"><b>-Template           standard</b></font> ^
+               -package            example.ioBuilder.dtar020 ^ 
+               -Schema             DTAR020.cbl   ^
+                 -FileOrganisation FixedWidth ^
+                 -font cp037 ^
+                 -DropCopybookName   true ^
+               -outputDirectory    DTAR020
+
+</pre>
+
+<p>The generated <b>FieldName</b> class is
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">32 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>class</strong></font> FieldNamesDtar020 <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">33 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">34 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>static</strong></font> <font color="#009966"><strong>final</strong></font> RecordDtar020 RECORD_DTAR020 <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">RecordDtar020</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>static</strong></font> <font color="#0099ff"><strong>class</strong></font> RecordDtar020 <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String keycodeNo <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">KEYCODE</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String storeNo <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">STORE</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String date <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">DATE</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String deptNo <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">DEPT</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String qtySold <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">QTY</font><font color="#ff00cc">-</font><font color="#ff00cc">SOLD</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String salePrice <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">SALE</font><font color="#ff00cc">-</font><font color="#ff00cc">PRICE</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">45 </font></span>
+</font></pre>
+
+<p>The generated <b>read</b> code is
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">60 </font></span>        AbstractLine line;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">61 </font></span>        <font color="#0099ff"><strong>int</strong></font> lineNum <font color="#000000"><strong>=</strong></font> <font color="#ff0000">0</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">62 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">63 </font></span>        <font color="#006699"><strong>try</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">64 </font></span>            ICobolIOBuilder iob <font color="#000000"><strong>=</strong></font> JRecordInterface1.COBOL
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">65 </font></span>                                       .<font color="#9966ff">newIOBuilder</font><font color="#000000"><strong>(</strong></font>copybookName<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">66 </font></span>                                           .<font color="#9966ff">setFont</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">CP037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">67 </font></span>                                           .<font color="#9966ff">setFileOrganization</font><font color="#000000"><strong>(</strong></font>Constants.IO_FIXED_LENGTH<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">68 </font></span>                                           .<font color="#9966ff">setSplitCopybook</font><font color="#000000"><strong>(</strong></font>CopybookLoader.SPLIT_NONE<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">69 </font></span>                                           .<font color="#9966ff">setDropCopybookNameFromFields</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">true</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">70 </font></span>                                       ;  
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">71 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">72 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">73 </font></span>            FieldNamesDtar020.RecordDtar020 rDtar020 <font color="#000000"><strong>=</strong></font> FieldNamesDtar020.RECORD_DTAR020;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">74 </font></span>            AbstractLineReader reader <font color="#000000"><strong>=</strong></font> iob.<font color="#9966ff">newReader</font><font color="#000000"><strong>(</strong></font>salesFile<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">75 </font></span>            <font color="#006699"><strong>while</strong></font> <font color="#000000"><strong>(</strong></font><font color="#000000"><strong>(</strong></font>line <font color="#000000"><strong>=</strong></font> reader.<font color="#9966ff">read</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>!</strong></font><font color="#000000"><strong>=</strong></font> <font color="#cc00cc">null</font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">76 </font></span>                lineNum <font color="#000000"><strong>+</strong></font><font color="#000000"><strong>=</strong></font> <font color="#ff0000">1</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">77 </font></span>                System.out.<font color="#9966ff">println</font><font color="#000000"><strong>(</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">78 </font></span>                              line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>rDtar020.keycodeNo<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">79 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>rDtar020.storeNo<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">80 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>rDtar020.date<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">81 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>rDtar020.deptNo<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">82 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>rDtar020.qtySold<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">83 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>rDtar020.salePrice<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">84 </font></span>                   <font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">85 </font></span>            <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">86 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">87 </font></span>            reader.<font color="#9966ff">close</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">88 </font></span>        <font color="#000000"><strong>}</strong></font> <font color="#006699"><strong>catch</strong></font> <font color="#000000"><strong>(</strong></font>Exception e<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+</font></pre>
+
+
+<h2><a id="walker">CodeGen Walker Interface</a></h2>
+
+<h3><a id="stdwalker">Standard Walker Interface</a></h3>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span>        ICobolIOBuilder ioBuilder <font color="#000000"><strong>=</strong></font> JRecordInterface1.COBOL
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>                .<font color="#9966ff">newIOBuilder</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">.</font><font color="#ff00cc">cbl</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>                        .<font color="#9966ff">setFileOrganization</font><font color="#000000"><strong>(</strong></font>IFileStructureConstants.IO_FIXED_LENGTH<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span>                        .<font color="#9966ff">setFont</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span>        ISchemaWalkerInterface walker <font color="#000000"><strong>=</strong></font> CodeGenInterface.WALKER;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span>        walker.<font color="#9966ff">newBuilder</font><font color="#000000"><strong>(</strong></font>ioBuilder<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">15 </font></span>                    .<font color="#9966ff">setOutputDirectory</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">/</font><font color="#ff00cc">home</font><font color="#ff00cc">/</font><font color="#ff00cc">bruce</font><font color="#ff00cc">/</font><font color="#ff00cc">work</font><font color="#ff00cc">/</font><font color="#ff00cc">JRecord</font><font color="#ff00cc">/</font><font color="#ff00cc">CodeGen</font><font color="#ff00cc">/</font><font color="#ff00cc">walker</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">16 </font></span>                    .<font color="#9966ff">setCobolDataClassPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">test</font><font color="#ff00cc">.</font><font color="#ff00cc">walker</font><font color="#ff00cc">.</font><font color="#ff00cc">Builder</font><font color="#ff00cc">.</font><font color="#ff00cc">GenerateCode</font><font color="#ff00cc">.</font><font color="#ff00cc">data</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">17 </font></span>                    .<font color="#9966ff">setReadClassGenerateParameters</font><font color="#000000"><strong>(</strong></font>walker.<font color="#9966ff">newClassDetailsParam</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">18 </font></span>                                                        .<font color="#9966ff">setPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">test</font><font color="#ff00cc">.</font><font color="#ff00cc">walker</font><font color="#ff00cc">.</font><font color="#ff00cc">Builder</font><font color="#ff00cc">.</font><font color="#ff00cc">GenerateCode</font><font color="#ff00cc">.</font><font color="#ff00cc">example</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">19 </font></span>                    .<font color="#9966ff">setWriteClassGenerateParameters</font><font color="#000000"><strong>(</strong></font>walker.<font color="#9966ff">newClassDetailsParam</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">20 </font></span>                                                        .<font color="#9966ff">setPackageName</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">test</font><font color="#ff00cc">.</font><font color="#ff00cc">walker</font><font color="#ff00cc">.</font><font color="#ff00cc">Builder</font><font color="#ff00cc">.</font><font color="#ff00cc">GenerateCode</font><font color="#ff00cc">.</font><font color="#ff00cc">example</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">21 </font></span>                .<font color="#9966ff">generate</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+</font></pre>
+
+<p>This will generate a data class like:</p>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 3 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>class</strong></font> Dtar020 <font color="#009966"><strong>implements</strong></font> IGetByteData <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 4 </font></span>    <font color="#009966"><strong>private</strong></font> <font color="#009966"><strong>static</strong></font> IoProvider<font color="#000000"><strong>&lt;</strong></font>Dtar020, Dtar020<font color="#000000"><strong>&gt;</strong></font> provider <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> IoProvider<font color="#000000"><strong>&lt;</strong></font>Dtar020, Dtar020<font color="#000000"><strong>&gt;</strong></font><font color="#000000"><strong>(</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066"> 5 </font></span>            BasicFileSchema.<font color="#9966ff">newFixedSchema</font><font color="#000000"><strong>(</strong></font>IFileStructureConstants.IO_FIXED_LENGTH_RECORDS, <font color="#cc00cc">true</font>, <font color="#ff0000">27</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>, 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 6 </font></span>            <font color="#006699"><strong>new</strong></font> IDeserializer<font color="#000000"><strong>&lt;</strong></font>Dtar020<font color="#000000"><strong>&gt;</strong></font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 7 </font></span>                <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font> <font color="#009966"><strong>public</strong></font> Dtar020 <font color="#9966ff">deserialize</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>byte</strong></font>[] rec<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font> <font color="#006699"><strong>return</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">Dtar020</font><font color="#000000"><strong>(</strong></font>rec<font color="#000000"><strong>)</strong></font>; <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span>            <font color="#000000"><strong>}</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>static</strong></font> IoProvider<font color="#000000"><strong>&lt;</strong></font>Dtar020, Dtar020<font color="#000000"><strong>&gt;</strong></font> <font color="#9966ff">getIoProvider</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font> <font color="#006699"><strong>return</strong></font> provider;<font color="#000000"><strong>}</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span>    <font color="#009966"><strong>private</strong></font> <font color="#0099ff"><strong>byte</strong></font>[] cobolData;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#9966ff">Dtar020</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span>        cobolData <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#0099ff"><strong>byte</strong></font>[<font color="#ff0000">27</font>];
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">15 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">16 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">17 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#9966ff">Dtar020</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>byte</strong></font>[] cobolData<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">18 </font></span>        <font color="#cc00cc">this</font>.cobolData <font color="#000000"><strong>=</strong></font> cobolData; 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">19 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">20 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">21 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font> <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>byte</strong></font>[] <font color="#9966ff">getData</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>     <font color="#006699"><strong>return</strong></font> cobolData;   <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">22 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">23 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font> <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setData</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>byte</strong></font>[] data<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>        <font color="#cc00cc">this</font>.cobolData <font color="#000000"><strong>=</strong></font> data;  <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">24 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">25 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> IStringField keycodeNo <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">FieldValueCG</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">this</font>, FieldDetail.<font color="#9966ff">newFixedWidthField</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">-</font><font color="#ff00cc">KEYCODE</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>, Type.ftChar, <font color="#ff0000">1</font>, <font color="#ff0000">8</font>, <font color="#ff0000">0</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">26 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> IIntField storeNo <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">FieldValueCG</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">this</font>, FieldDetail.<font color="#9966ff">newFixedWidthField</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">-</font><font color="#ff00cc">STORE</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>, Type.ftPackedDecimal, <font color="#ff0000">9</font>, <font color="#ff0000">2</font>, <font color="#ff0000">0</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">27 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> IIntField date <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">FieldValueCG</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">this</font>, FieldDetail.<font color="#9966ff">newFixedWidthField</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">-</font><font color="#ff00cc">DATE</font><font color="#ff00cc">&quot;</font>, Type.ftPackedDecimal, <font color="#ff0000">11</font>, <font color="#ff0000">4</font>, <font color="#ff0000">0</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">28 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> IIntField deptNo <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">FieldValueCG</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">this</font>, FieldDetail.<font color="#9966ff">newFixedWidthField</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">-</font><font color="#ff00cc">DEPT</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>, Type.ftPackedDecimal, <font color="#ff0000">15</font>, <font color="#ff0000">2</font>, <font color="#ff0000">0</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">29 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> IIntField qtySold <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">FieldValueCG</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">this</font>, FieldDetail.<font color="#9966ff">newFixedWidthField</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">-</font><font color="#ff00cc">QTY</font><font color="#ff00cc">-</font><font color="#ff00cc">SOLD</font><font color="#ff00cc">&quot;</font>, Type.ftPackedDecimal, <font color="#ff0000">17</font>, <font color="#ff0000">5</font>, <font color="#ff0000">0</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">30 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> IDecimalField salePrice <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">FieldValueCG</font><font color="#000000"><strong>(</strong></font><font color="#cc00cc">this</font>, FieldDetail.<font color="#9966ff">newFixedWidthField</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">-</font><font color="#ff00cc">SALE</font><font color="#ff00cc">-</font><font color="#ff00cc">PRICE</font><font color="#ff00cc">&quot;</font>, Type.ftPackedDecimal, <font color="#ff0000">22</font>, <font color="#ff0000">6</font>, <font color="#ff0000">2</font>, <font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">31 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">32 </font></span>
+</font></pre>
+
+
+<p>and example generated code to read the file</p>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066"> 5 </font></span>        IReader<font color="#000000"><strong>&lt;</strong></font>Dtar020<font color="#000000"><strong>&gt;</strong></font> reader <font color="#000000"><strong>=</strong></font> Dtar020.<font color="#9966ff">getIoProvider</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>.<font color="#9966ff">newReader</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">filename</font><font color="#ff00cc">?</font><font color="#ff00cc">?</font><font color="#ff00cc">?</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 6 </font></span>        Dtar020 line;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 7 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span>        <font color="#006699"><strong>while</strong></font> <font color="#000000"><strong>(</strong></font><font color="#000000"><strong>(</strong></font>line <font color="#000000"><strong>=</strong></font> reader.<font color="#9966ff">read</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>!</strong></font><font color="#000000"><strong>=</strong></font> <font color="#cc00cc">null</font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>            System.out.<font color="#9966ff">println</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>                <font color="#000000"><strong>+</strong></font> line.keycodeNo.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span>                <font color="#000000"><strong>+</strong></font> line.storeNo.<font color="#9966ff">asInt</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>                <font color="#000000"><strong>+</strong></font> line.date.<font color="#9966ff">asInt</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span>                <font color="#000000"><strong>+</strong></font> line.deptNo.<font color="#9966ff">asInt</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span>                <font color="#000000"><strong>+</strong></font> line.qtySold.<font color="#9966ff">asInt</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">15 </font></span>                <font color="#000000"><strong>+</strong></font> line.salePrice.<font color="#9966ff">asBigDecimal</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">16 </font></span>            <font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">17 </font></span>        <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">18 </font></span>        reader.<font color="#9966ff">close</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+</font></pre>
+
+<h3><a id="usrwalker">User written Schema Walker</a></h3>
+<p>The Schema walker was provided to allow users to write there own Code Generation code in Java.</p>
+<p>The schema walker walks the records and fields of a schema calls a  user supplied <i>listener</i> class to process each record/field.
+This listener supplied class can generate code amongst other things.</p>
+
+<p>The following walker example will list the records and fields in a Cobol copybook:</p>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 3 </font></span>        ICobolIOBuilder ioBuilder <font color="#000000"><strong>=</strong></font> JRecordInterface1.COBOL
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 4 </font></span>                .<font color="#9966ff">newIOBuilder</font><font color="#000000"><strong>(</strong></font>TstIoBldrGen01.<font color="#0099ff"><strong>class</strong></font>.<font color="#9966ff">getResource</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR020</font><font color="#ff00cc">.</font><font color="#ff00cc">cbl</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>.<font color="#9966ff">getFile</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066"> 5 </font></span>                        .<font color="#9966ff">setFileOrganization</font><font color="#000000"><strong>(</strong></font>IFileStructureConstants.IO_FIXED_LENGTH<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 6 </font></span>                        .<font color="#9966ff">setFont</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 7 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span>        CodeGenInterface.WALKER.<font color="#9966ff">newSchemaWalker</font><font color="#000000"><strong>(</strong></font>ioBuilder<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>            .<font color="#9966ff">walk</font><font color="#000000"><strong>(</strong></font><font color="#006699"><strong>new</strong></font> <font color="#9966ff">SchemaWalkerAdapter</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span>                <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font> <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">startRecord</font><font color="#000000"><strong>(</strong></font>LayoutDef schema, RecordDef record<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>                    System.out.<font color="#9966ff">println</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#6600cc">\n</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> record.<font color="#9966ff">getCobolName</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span>                <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">15 </font></span>                String spaces <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">16 </font></span>                <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font> <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">processField</font><font color="#000000"><strong>(</strong></font>LayoutDef schema, RecordDef record, FieldDef fieldDtls<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">17 </font></span>                    Usage usage <font color="#000000"><strong>=</strong></font> fieldDtls.<font color="#9966ff">getCobolItem</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>.<font color="#9966ff">getUsage</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">18 </font></span>                    System.out.<font color="#9966ff">println</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font> 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">19 </font></span>                            <font color="#000000"><strong>+</strong></font> <font color="#000000"><strong>(</strong></font>fieldDtls.<font color="#9966ff">getCobolName</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> spaces<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">subSequence</font><font color="#000000"><strong>(</strong></font><font color="#ff0000">0</font>, <font color="#ff0000">32</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">20 </font></span>                            <font color="#000000"><strong>+</strong></font> fieldDtls.<font color="#9966ff">getPos</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> fieldDtls.<font color="#9966ff">getLen</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> fieldDtls.<font color="#9966ff">getDecimal</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">21 </font></span>                            <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> fieldDtls.<font color="#9966ff">getCobolItem</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>.<font color="#9966ff">getPicture</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">22 </font></span>                            <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#6600cc">\t</font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> <font color="#000000"><strong>(</strong></font>usage <font color="#000000"><strong>=</strong></font><font color="#000000"><strong>=</strong></font> Usage.NONE ? <font color="#ff00cc">&quot;</font><font color="#ff00cc">&quot;</font> : usage<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">23 </font></span>                            <font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">24 </font></span>                <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">25 </font></span>            <font color="#000000"><strong>}</strong></font><font color="#000000"><strong>)</strong></font>;
+</font></pre>
+
+<p>There are several examples of <i>walker listener</i> classes in the codegen package, these are
+some examples<ul>
+ <li><a href="Source/JRecord_CodeGen/src/net/sf/JRecord/cg/walker/classGenerator/ClassGeneratorWalker.java">Generate a <i>java data</i> class for a Cobol copybook</a></li>
+ <li><a href="Source/JRecord_CodeGen/src/net/sf/JRecord/cg/walker/classGenerator/MultiRecordReaderCodeGen.java">Generate a java program to read a Cobol data file</a></li>
+</ul>
+
+<p/>&nbsp;<p/>
+<h2><a id="template">CodeGen Templates</a></h2>
+
+<p>The <font color="blue">CodeGen</font> program reads a Cobol-Copybook and Generates <font color="green">Java~JRecord</font>
+Code to read/write the Cobol-Data file. <b>CodeGen</b> is built around <i>Templates</i>.
+A <b>CodeGen Template</b> is a directory of <a href="http://velocity.apache.org/engine/devel/vtl-reference-guide.html">Velocity Templates</a>
+with a <b>Generate.properties</b> control file. Each <b>CodeGen Template</b> generates one or more programs/files.</p> 
+
+<p>The <font color="blue"><b>templates I suggest looking at</b></font> are:</p>
+<ul>
+ <li><a href="#pojo">pojo</a> - will convert the Cobol Records to / from Java objects.
+It can have problems if there are duplicate field names, redefines or complicated Cobol files</li>
+ <li><a href="#lineWrapper">lineWrapper</a> - This creates a <i>Java Wrapper</i> around a
+<i>JRecord~Line</i>. It is good when only accessing a few fields or the files is to complicated for
+the <a href="#pojo">pojo</a>  template</li>
+ <li><a href="#standard">standard</a> generates basic low-level JRecord code without any <i>java representation</i>.
+This template <b>will</b> handle Cobol Copybooks the other templates <b>will not</b>.</li>
+</ul>
+ 
+
+ <p><font color="blue">CodeGen</font> code-templates include:
+<ul>
+ <li><b>basic</b> - generate very basic JRecord Read/Write example code.</li>
+ <li><a href="#standard">standard</a> - like the <b>basic</b> template only a Class holding <b>Cobol Field Names</b></li>
+is generated and used. The initial release of <font color="blue">CodeGen</font> focuses on the <b>Standard</b> Template.
+There are examples in the <a href="CodeGenExample/standard/ReadMe.htm">CodeGenExample/standard</a> directory</li> 
+ <li><a href="#lineWrapper">lineWrapper</a> - Is an extension on the <i>standard</i> template. It generates a <i>line-wrapper</i>
+the has getter/setters for the Cobol fields.
+ <li><a href="#lineWrapperPojo">lineWrapperPojo</a> - Is an extension on the <i>lineWrapper</i> template. It generates an interface for the <i>line-wrapper</i>
++ an alternative <i>Pojo</i> implementation of the line.
+ <li><a href="#pojo">pojo</a> - Provides basic Pojo (plain old java objects) with readers / writers for the Pojo</a>
+ <li><b>schemaClass</b> An extension of <i>standard</i> template. It generates a full <i>schema</i> class. The 
+Schema details can be either loaded from a <b>Cobol</b> copybook or <b>Created</b> at run time.
+There are likely to be problems with <i>Occurs Depending</i>.
+See <a href="CodeGenExample/otherTemplates/readme.html">CodeGenExample/otherTemplates</a> for examples of generating <b>schemaClass</b> templates.</li>
+ <li><b>javaPojo</b> Generates a <font color="blue">Pojo / Javabean</font> class + reader, writer and schema classes.
+This template currently supports single record files with no redefines (and no utf-8/16 files).
+See <a href="CodeGenExample/otherTemplates/readme.html">CodeGenExample/otherTemplates</a> for examples of generating <b>javaPojo</b> templates.
+</li>
+</ul>
+
+<h3><a id="standard">Standard CodeGen Template</a></h3>
+The <a href="CodeGenExample/standard/ReadMe.htm">standard</a> is a fairly simple "Template", it generates 3 files<ol>
+<li>A <b>field name</b> Class. This field name class holds all the <i>Cobol Field names</i> 
+as java final variables. Rather than having to remember the <i>Cobol Field names</i>, you can then use Auto-Completion in your IDE. There will be issues
+if there are duplicate field names.</li>
+<li>A sample <i>Read</i> program.
+<li>A sample <i>Write</i> program.
+</ol>
+
+
+<h3><a id="lineWrapper">Line Wrapper Template</a></h3>
+
+The <a href="CodeGenExample/lineWrapper/ReadMe.htm">lineWrapper</a> is an extension of the <a href="CodeGenExample/standard/ReadMe.htm">standard</a> "Template", it adds a LineWrapper class<ol>
+<li>The <b>LineWrapper</b> class - this class has getter/setters methods for the Cobol Fields. These getter/setter call the getFieldValue(...) method
+of the "wrapped" line.
+<li>A <b>field name</b> Class. This field name class holds all the <i>Cobol Field names</i> 
+as java final variables. Rather than having to remember the <i>Cobol Field names</i>, you can then use Auto-Completion in your IDE. There will be issues
+if there are duplicate field names.</li>
+<li>A sample <i>Read</i> program.
+<li>A sample <i>Write</i> program.
+</ol>
+
+
+<p>There are examples of generating Java-JRecord code using the <b>standard</b> Template in the <a href="CodeGenExample/lineWrapper">CodeGenExample/lineWrapper</a> directory.</p>
+<p>Basically to generate Java code for a Mainframe EBCDIC Fixed-Record-Length  file:</p>
+
+<p>To produce skeleton programs using Single record copybook (taken from <a href="CodeGenExample/lineWrapper/genDTAR027.bat">genDTAR027.bat</a>):</p>
+<pre>
+
+  java -jar ../../lib/JRecordCodeGen.jar  ^
+               <font color="blue"><b>-Template           lineWrapper</b></font> ^
+               -package            lineWrapper.dtar027 ^ 
+               -Schema             DTAR027.cbl   ^
+                 -FileOrganisation FixedWidth ^
+                 -font             cp037 ^
+                 -DropCopybookName true ^
+               -outputDirectory    DTAR027
+
+
+</pre>
+
+ <a id="lwdtls"/>
+<p>The generated <b>FieldName</b> class is
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>class</strong></font> FieldNamesDtar027 <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>static</strong></font> <font color="#009966"><strong>final</strong></font> RecordDtar027 RECORD_DTAR027 <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">RecordDtar027</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>static</strong></font> <font color="#0099ff"><strong>class</strong></font> RecordDtar027 <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String keycodeNo <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR027</font><font color="#ff00cc">-</font><font color="#ff00cc">KEYCODE</font><font color="#ff00cc">-</font><font color="#ff00cc">NO</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String qtySold <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR027</font><font color="#ff00cc">-</font><font color="#ff00cc">QTY</font><font color="#ff00cc">-</font><font color="#ff00cc">SOLD</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span>       <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>final</strong></font> String salePrice <font color="#000000"><strong>=</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc">DTAR027</font><font color="#ff00cc">-</font><font color="#ff00cc">SALE</font><font color="#ff00cc">-</font><font color="#ff00cc">PRICE</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">45 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">46 </font></span>
+</font></pre>
+
+<b>Note:</b> This is exactly the same as fieldname class generated by <a href="CodeGenExample/standard/ReadMe.htm">standard</a> "Template".
+
+<p>The generated <b>LineWrapper</b> class is
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>class</strong></font> LineDtar027JR <font color="#009966"><strong>implements</strong></font> IGetByteData <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>    <font color="#009966"><strong>private</strong></font> AbstractLine line; 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>    <font color="#009966"><strong>private</strong></font> <font color="#009966"><strong>static</strong></font> FieldNamesDtar027.RecordDtar027 fn
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>                   <font color="#000000"><strong>=</strong></font> FieldNamesDtar027.RECORD_DTAR027;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">45 </font></span>    <font color="#009966"><strong>public</strong></font> String <font color="#9966ff">getKeycodeNo</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">46 </font></span>        <font color="#006699"><strong>return</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>fn.keycodeNo<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asString</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">47 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">48 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">49 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setKeycodeNo</font><font color="#000000"><strong>(</strong></font>String value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">50 </font></span>        <font color="#cc00cc">this</font>.line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>fn.keycodeNo<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">set</font><font color="#000000"><strong>(</strong></font>value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">51 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">52 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">53 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>int</strong></font> <font color="#9966ff">getQtySold</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">54 </font></span>        <font color="#006699"><strong>return</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>fn.qtySold<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asInt</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">55 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">56 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">57 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setQtySold</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>int</strong></font> value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">58 </font></span>        <font color="#cc00cc">this</font>.line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>fn.qtySold<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">set</font><font color="#000000"><strong>(</strong></font>value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">59 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">60 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">61 </font></span>    <font color="#009966"><strong>public</strong></font> BigDecimal <font color="#9966ff">getSalePrice</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">62 </font></span>        <font color="#006699"><strong>return</strong></font> line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>fn.salePrice<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">asBigDecimal</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">63 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">64 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">65 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setSalePrice</font><font color="#000000"><strong>(</strong></font>BigDecimal value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">66 </font></span>        <font color="#cc00cc">this</font>.line.<font color="#9966ff">getFieldValue</font><font color="#000000"><strong>(</strong></font>fn.salePrice<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">set</font><font color="#000000"><strong>(</strong></font>value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">67 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">68 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">69 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">70 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">71 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">72 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">73 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">74 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>byte</strong></font>[] <font color="#9966ff">getData</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">75 </font></span>        <font color="#006699"><strong>return</strong></font> line.<font color="#9966ff">getData</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;  
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">76 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">77 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">78 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">79 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setData</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>byte</strong></font>[] data<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">80 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">81 </font></span>        <font color="#006699"><strong>if</strong></font> <font color="#000000"><strong>(</strong></font>line <font color="#006699"><strong>instanceof</strong></font> Line<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">82 </font></span>            <font color="#000000"><strong>(</strong></font><font color="#000000"><strong>(</strong></font>Line<font color="#000000"><strong>)</strong></font> line<font color="#000000"><strong>)</strong></font>.<font color="#9966ff">setData</font><font color="#000000"><strong>(</strong></font>data<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">83 </font></span>        <font color="#000000"><strong>}</strong></font> <font color="#006699"><strong>else</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">84 </font></span>            <font color="#006699"><strong>throw</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">RuntimeException</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">Invalid</font><font color="#ff00cc"> </font><font color="#ff00cc">line</font><font color="#ff00cc"> </font><font color="#ff00cc">for</font><font color="#ff00cc"> </font><font color="#ff00cc">setdata</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">85 </font></span>        <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">86 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">87 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">88 </font></span>    <font color="#009966"><strong>public</strong></font> LineDtar027JR <font color="#9966ff">setLine</font><font color="#000000"><strong>(</strong></font>AbstractLine l<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">89 </font></span>        line <font color="#000000"><strong>=</strong></font> l;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">90 </font></span>        <font color="#006699"><strong>return</strong></font> <font color="#cc00cc">this</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">91 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">92 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">93 </font></span>
+</font></pre>
+
+<p>The generated <b>read</b> code is
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">69 </font></span>            ICobolIOBuilder iob <font color="#000000"><strong>=</strong></font> JRecordInterface1.COBOL
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">70 </font></span>                                       .<font color="#9966ff">newIOBuilder</font><font color="#000000"><strong>(</strong></font>copybookName<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">71 </font></span>                                           .<font color="#9966ff">setFont</font><font color="#000000"><strong>(</strong></font><font color="#ff00cc">&quot;</font><font color="#ff00cc">cp037</font><font color="#ff00cc">&quot;</font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">72 </font></span>                                           .<font color="#9966ff">setFileOrganization</font><font color="#000000"><strong>(</strong></font>Constants.IO_FIXED_LENGTH<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">73 </font></span>                                           .<font color="#9966ff">setSplitCopybook</font><font color="#000000"><strong>(</strong></font>CopybookLoader.SPLIT_NONE<font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">74 </font></span>                                       ;  
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">75 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">76 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">77 </font></span>           LineDtar027JR lineDtar027JR <font color="#000000"><strong>=</strong></font> <font color="#006699"><strong>new</strong></font> <font color="#9966ff">LineDtar027JR</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">78 </font></span> 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">79 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">80 </font></span>           AbstractLineReader reader <font color="#000000"><strong>=</strong></font> iob.<font color="#9966ff">newReader</font><font color="#000000"><strong>(</strong></font>dataFile<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">81 </font></span>           <font color="#006699"><strong>while</strong></font> <font color="#000000"><strong>(</strong></font><font color="#000000"><strong>(</strong></font>line <font color="#000000"><strong>=</strong></font> reader.<font color="#9966ff">read</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>!</strong></font><font color="#000000"><strong>=</strong></font> <font color="#cc00cc">null</font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">82 </font></span>               lineNum <font color="#000000"><strong>+</strong></font><font color="#000000"><strong>=</strong></font> <font color="#ff0000">1</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">83 </font></span>               lineDtar027JR.<font color="#9966ff">setLine</font><font color="#000000"><strong>(</strong></font>line<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">84 </font></span>               System.out.<font color="#9966ff">println</font><font color="#000000"><strong>(</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">85 </font></span>                              lineDtar027JR.<font color="#9966ff">getKeycodeNo</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">86 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> lineDtar027JR.<font color="#9966ff">getQtySold</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">87 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> lineDtar027JR.<font color="#9966ff">getSalePrice</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">88 </font></span>                   <font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">89 </font></span>            <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">90 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">91 </font></span>            reader.<font color="#9966ff">close</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+</font></pre>
+
+
+<h3><a id="lineWrapperPojo">lineWrapperPojo Template</a></h3>
+
+<p>The <a href="CodeGenExample/lineWrapperPojo/">lineWrapperPojo</a> template is an extension of the <a href="#lineWrapper">lineWrapper</a> template. The <b>Read</b>/<b>write</b> programs + the 
+FieldName and Line**JR classes are very similar to the <b>LineWrapper</b> versions.
+<p>What you need to understand with <a href="CodeGenExample/lineWrapperPojo/">lineWrapperPojo</a> template is the relationship between the
+ILine... interface and it's two implementing classes. For DTAR027:
+<pre>
+
+       <b>Interface                    Implementing class</b>
+       
+                       +---- <b>LineDtar027JR</b>   - Implemented as a wrapper around a
+                       |     |           ^     JRecord Line 
+                       |     |           | 
+  <b>ILineDtar027Upd</b> -----+     | <b>toPojo()</b>  | <b>set(ILineDtar027 line)</b>                  
+                       |     |           |
+                       |     V           | 
+                       +---- <b>LineDtar027Pojo</b> - Implemented using standard java
+                                               types, it does not reference JRecord
+
+
+</pre>
+
+<p>To produce skeleton programs using Single record copybook (taken from <a href="CodeGenExample/lineWrapperPojo/genDTAR027.bat">genDTAR027.bat</a>):</p>
+<pre>
+
+  java -jar ../../lib/JRecordCodeGen.jar  ^
+               <font color="blue"><b>-Template           lineWrapperPojo</b></font> ^
+               -package            lineWrapperPojo.dtar027 ^ 
+               -Schema             DTAR027.cbl   ^
+                 -FileOrganisation FixedWidth ^
+                 -font             cp037 ^
+                 -DropCopybookName true ^
+               -outputDirectory    DTAR027
+
+
+</pre>
+
+<p>For the Read, FieldName and LineDtar027JR classes see there versions in the <a href="#lwdtls">LineWrapper</a> template.
+<p>For IDtar027Pojo:
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">30 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>interface</strong></font> IDtar027Pojo <font color="#009966"><strong>extends</strong></font> IDtar027Upd, IDtar027 <font color="#000000"><strong>{</strong></font> <font color="#000000"><strong>}</strong></font>
+</font></pre>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">32 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>interface</strong></font> IDtar027 <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">33 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">34 </font></span>    <font color="#009966"><strong>public</strong></font> String <font color="#9966ff">getKeycodeNo</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>int</strong></font> <font color="#9966ff">getQtySold</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span>    <font color="#009966"><strong>public</strong></font> BigDecimal <font color="#9966ff">getSalePrice</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>
+</font></pre>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">32 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>interface</strong></font> IDtar027Upd <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">33 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">34 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>abstract</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setKeycodeNo</font><font color="#000000"><strong>(</strong></font>String value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>abstract</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setQtySold</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>int</strong></font> value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>abstract</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setSalePrice</font><font color="#000000"><strong>(</strong></font>BigDecimal value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#009966"><strong>abstract</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">set</font><font color="#000000"><strong>(</strong></font>IDtar027 value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>
+</font></pre>
+
+<p>Finally the LinePojo looks like:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>class</strong></font> LineDtar027Pojo <font color="#009966"><strong>implements</strong></font> IDtar027Pojo <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>    <font color="#009966"><strong>private</strong></font> String keycodeNo;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>    <font color="#009966"><strong>private</strong></font> <font color="#0099ff"><strong>int</strong></font> qtySold;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>    <font color="#009966"><strong>private</strong></font> BigDecimal salePrice;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>    <font color="#009966"><strong>public</strong></font> String <font color="#9966ff">getKeycodeNo</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span>        <font color="#006699"><strong>return</strong></font> keycodeNo;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">45 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">46 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">47 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setKeycodeNo</font><font color="#000000"><strong>(</strong></font>String value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">48 </font></span>        <font color="#cc00cc">this</font>.keycodeNo <font color="#000000"><strong>=</strong></font> value;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">49 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">50 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">51 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">52 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>int</strong></font> <font color="#9966ff">getQtySold</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">53 </font></span>        <font color="#006699"><strong>return</strong></font> qtySold;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">54 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">55 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">56 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">57 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setQtySold</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>int</strong></font> value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">58 </font></span>        <font color="#cc00cc">this</font>.qtySold <font color="#000000"><strong>=</strong></font> value;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">59 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">60 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">61 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">62 </font></span>    <font color="#009966"><strong>public</strong></font> BigDecimal <font color="#9966ff">getSalePrice</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">63 </font></span>        <font color="#006699"><strong>return</strong></font> salePrice;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">64 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">65 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">66 </font></span>    <font color="#66ccff"><strong>@</strong></font><font color="#66ccff"><strong>Override</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">67 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setSalePrice</font><font color="#000000"><strong>(</strong></font>BigDecimal value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">68 </font></span>        <font color="#cc00cc">this</font>.salePrice <font color="#000000"><strong>=</strong></font> value;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">69 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">70 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">71 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">72 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">set</font><font color="#000000"><strong>(</strong></font>IDtar027 value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">73 </font></span>        CodeDtar027
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">74 </font></span>            .<font color="#9966ff">assignDtar027</font><font color="#000000"><strong>(</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">75 </font></span>                <font color="#cc00cc">this</font>, value<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">76 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">77 </font></span><font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">78 </font></span>
+</font></pre>
+
+<h3><a id="pojo">Pojo Template</a></h3>
+The Pojo Template will generate a:
+<ul>
+ <li><b>Pojo</b> class that holds the files data in <i>Java</i> form.</li>
+ <li><b>Conversion</b> classes to convert between Cobol and Java.</li>
+ <li><b>IoBuilder</b> class which will create <i>reader's</i> and <i>writer's</i>.</li>
+ <li>Example read and Write programs.</li>
+</ul>
+
+
+<h4>Generated Pojo</h4>
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">34 </font></span><font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>class</strong></font> LineDtar027Pojo   <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span>    <font color="#009966"><strong>private</strong></font> String keycodeNo;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span>    <font color="#009966"><strong>private</strong></font> <font color="#0099ff"><strong>int</strong></font> qtySold;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span>    <font color="#009966"><strong>private</strong></font> BigDecimal salePrice;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>   
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>    <font color="#009966"><strong>public</strong></font> String <font color="#9966ff">getKeycodeNo</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>        <font color="#006699"><strong>return</strong></font> keycodeNo;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setKeycodeNo</font><font color="#000000"><strong>(</strong></font>String value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">45 </font></span>        <font color="#cc00cc">this</font>.keycodeNo <font color="#000000"><strong>=</strong></font> value;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">46 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">47 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">48 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>int</strong></font> <font color="#9966ff">getQtySold</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">49 </font></span>        <font color="#006699"><strong>return</strong></font> qtySold;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">50 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">51 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">52 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setQtySold</font><font color="#000000"><strong>(</strong></font><font color="#0099ff"><strong>int</strong></font> value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">53 </font></span>        <font color="#cc00cc">this</font>.qtySold <font color="#000000"><strong>=</strong></font> value;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">54 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">55 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">56 </font></span>    <font color="#009966"><strong>public</strong></font> BigDecimal <font color="#9966ff">getSalePrice</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">57 </font></span>        <font color="#006699"><strong>return</strong></font> salePrice;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">58 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">59 </font></span>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">60 </font></span>    <font color="#009966"><strong>public</strong></font> <font color="#0099ff"><strong>void</strong></font> <font color="#9966ff">setSalePrice</font><font color="#000000"><strong>(</strong></font>BigDecimal value<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">61 </font></span>        <font color="#cc00cc">this</font>.salePrice <font color="#000000"><strong>=</strong></font> value;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">62 </font></span>    <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">63 </font></span><font color="#000000"><strong>}</strong></font>
+</font></pre>
+
+
+<h4>Generated Reading Example</h4>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">65 </font></span>        IReader<font color="#000000"><strong>&lt;</strong></font>LineDtar027Pojo<font color="#000000"><strong>&gt;</strong></font> reader <font color="#000000"><strong>=</strong></font> <font color="#cc00cc">null</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">66 </font></span>        <font color="#006699"><strong>try</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">67 </font></span>            IoBuilder<font color="#000000"><strong>&lt;</strong></font>LineDtar027Pojo<font color="#000000"><strong>&gt;</strong></font> iob <font color="#000000"><strong>=</strong></font> IoBuilderDtar027.<font color="#9966ff">newIoBuilder</font><font color="#000000"><strong>(</strong></font>copybookName<font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">68 </font></span>            LineDtar027Pojo line;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">69 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">70 </font></span>            reader <font color="#000000"><strong>=</strong></font> iob.<font color="#9966ff">newReader</font><font color="#000000"><strong>(</strong></font>dataFile<font color="#000000"><strong>)</strong></font>;        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">71 </font></span>            <font color="#006699"><strong>while</strong></font> <font color="#000000"><strong>(</strong></font><font color="#000000"><strong>(</strong></font>line <font color="#000000"><strong>=</strong></font> reader.<font color="#9966ff">read</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>!</strong></font><font color="#000000"><strong>=</strong></font> <font color="#cc00cc">null</font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">72 </font></span>                lineNum <font color="#000000"><strong>+</strong></font><font color="#000000"><strong>=</strong></font> <font color="#ff0000">1</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">73 </font></span>                
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">74 </font></span>               System.out.<font color="#9966ff">println</font><font color="#000000"><strong>(</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">75 </font></span>                              line.<font color="#9966ff">getKeycodeNo</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">76 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getQtySold</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">77 </font></span>                      <font color="#000000"><strong>+</strong></font> <font color="#ff00cc">&quot;</font><font color="#ff00cc"> </font><font color="#ff00cc">&quot;</font> <font color="#000000"><strong>+</strong></font> line.<font color="#9966ff">getSalePrice</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">78 </font></span>                   <font color="#000000"><strong>)</strong></font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">79 </font></span>            <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">80 </font></span>        <font color="#000000"><strong>}</strong></font> <font color="#006699"><strong>catch</strong></font> <font color="#000000"><strong>(</strong></font>IOException e<font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font>
+</font></pre>
+
+<h3><a id="Other">Other Templates</a></h3>
+<p>There are bat/shell scripts for generating programs using the 
+<b>schemaClass</b> and <b>javaPojo</b> Templates in the <a href="CodeGenExample/otherTemplates">CodeGenExample/otherTemplates</a>
+
+<h2><a id="UseCodeGen">Example of Using CodeGen generated classes</a></h2>
+<p>The <a href="CodeGenExample/ExampleOfUsingCodeGen/ReadMe.html">LayoutCompare</a> sub-project uses java class's generated from a 
+Cobol Copybook <a href="CodeGenExample/ExampleOfUsingCodeGen/JR_Schema_Test.cbl">JR_Schema_Test.cbl</a> using the <b>lineWrapper</b>
+CodeGen Template. 
+
+<p>The project uses the following classes are generated by CodeGen:
+<ul>
+ <li><a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/FieldNamesJrSchemaTest.java">FieldNamesJrSchemaTest.java</a> - Holds the Cobol Field names. It used by the other classes to access the Fields</li>
+ <li><a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LineCopybookRecordJR.java">LineCopybookRecordJR.java</a> - Line-Wrapper class for the <i>Copybook</i> Record in the above Cobol Copybook.</li>
+ <li><a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LineDialectRecordJR.java">LineDialectRecordJR.java</a> - Line-Wrapper class for the <i>Dialect</i> Record in the above Cobol Copybook.</li>
+ <li><a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LineSchemaRecordRecordJR.java">LineSchemaRecordRecordJR.java</a> - Line-Wrapper class for the <i>Schema-Record</i> Record in the above Cobol Copybook.</li>
+ <li><a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LineFieldRecordJR.java">LineFieldRecordJR.java</a> - Line-Wrapper class for the <i>Field</i> Record in the above Cobol Copybook.</li>
+</ul>
+
+<p>These generated classes are organised into a <b>Layout - Record - Field</b> Hierachy by the
+<a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LayoutDtls.java">LayoutDtls</a>
+and <a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/RecordDtls.java">RecordDtls</a> classes: 
+<pre>
+       <a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LayoutDtls.java">LayoutDtls</a>
+            |      1 to many
+            +------------------- <a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/RecordDtls.java">RecordDtls</a>
+                                    |        1 to many
+                                    +---------------------- <a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LineFieldRecordJR.java">LineFieldRecordJR</a>
+</pre>            
+
+<p>Finally there are 2 IO classes:<ul>
+<li>The <a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/io/WriteJrSchema.java">WriteJrSchema.java</a> class will write <b>JRecord-Layout</b> to an external file (using the above generated classes).</li>
+<li>The <a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/io/ReadJrSchema.java">ReadJrSchema.java</a> class will read the file into a 
+<a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/gen/data/LayoutDtls.java">LayoutDtls</a> classes. These <b>LayoutDtls</b> are compared by program
+<a href="CodeGenExample/ExampleOfUsingCodeGen/src/net/sf/JRecord/test/schema/cobol/io/CompareCopybookDetails.java">CompareCopybookDetails.java</a> 
+with a JRecord-Layout that was generated with current version of JRecord.</li>
+</ul>
+
+<p>The <a href="CodeGenExample/ExampleOfUsingCodeGen/ReadMe.html">LayoutCompare</a> sub-project is
+in the <a href="CodeGenExample/ExampleOfUsingCodeGen/">CodeGenExample/ExampleOfUsingCodeGen/</a> directory.
+
+<h3><a id="pojoWithInterface">PojoWithInterface Template</a></h3>
+<p>This is an extension of the <a href="#pojo">pojo</a> template. It adds extra Get/Set interfaces and
+extra update methods (using the interfaces.</p>
+<p>Look at the description of the a href="#pojo">pojo</a> template.</p>
+
+<h2><a id="userTemplates">User Written CodeGen Templates</a></h2>
+
+
+ <p>It is possible to write your own "Templates". In the <a href="CodeGenExample/userTemplates/userWrittenTemplates">userWrittenTemplates</a>
+directory there are 2 sample <i>user</i> Templates:<ul>
+<li><a href="CodeGenExample/userTemplates/userWrittenTemplates/xBasic">xBasic</a> - copied from the standard <i>basic</i> template.</li>
+<li><a href="CodeGenExample/userTemplates/userWrittenTemplates/xLineWrapper">xLineWrapper</a> - copied from the standard <i>xLineWrapper</i> template.</li>
+</ul>
+<p>These templates a simply copies of the standard <b>basic</b> and <b>lineWrapper</b> templates.
+ <h3><a id="codeGenTemplate">What is a CodeGen Template</a></h3>
+ <p>A <b>CodeGen Template</b> is a <b>Directory</b> holding a <a href="CodeGenExample/userTemplates/userWrittenTemplates/xBasic/Generate.properties">Generate.properties</a> file.
+The <a href="CodeGenExample/userTemplates/userWrittenTemplates/xBasic/Generate.properties">Generate.properties</a> file
+holds
+<ul>
+ <li><a href="http://velocity.apache.org/">Velocity Templates</a> to be <i>Generated</i></li>
+ <li>The output names of the Generated <b>Velocity</b> templates.</li>
+ <li>Various options related to the <i>Template</i></li>
+</ul>
+<p>A basic Template looks like:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">1 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>0</strong></font>=<font color="#ff0000">2</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">2 </font></span><font color="#cc0000">#</font><font color="#cc0000">#</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">3 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>1</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>template</strong></font>=&amp;template./exampleRead.vm
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">4 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>1</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>output</strong></font>=CodeGenExample/Read&amp;suffix..java
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">5 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>2</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>template</strong></font>=&amp;template./exampleWrite.vm
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">6 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>2</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>output</strong></font>=CodeGenExample/Write&amp;suffix..java
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">7 </font></span><font color="#cc0000">#</font><font color="#cc0000">#</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">8 </font></span><font color="#006699"><strong>requirePackageId</strong></font>=N
+</font></pre>
+
+<p>Options include:</p>
+<ul>
+ <li>The <font color="blue">skel.0</font>=<font color="red">2</font> tells <b>CodeGen</b>
+there are 2 <a href="http://velocity.apache.org/">Velocity Templates</a> to be <i>Generated</i></li>
+ <li>The <font color="blue">skel.1.template</font>=<b><font color="green">&amp;template./exampleRead.vm</font></b> to generate the <b>exampleRead.vm</b>
+file in the current directory.</li>
+ <li>The <font color="blue">skel.1.output</font>=<b><font color="green">CodeGenExample/Read&amp;suffix..java</font></b> tells <i>CodeGen</i> the output name.
+&amp;suffix. is replaced by the Schema (or layout) name.</li>
+  <li>The <font color="blue">requirePackageId</font>=<b><font color="green">N</font></b> tells <i>CodeGen</i> a java package-id is <b>not</b> required.</li>
+  <li>The <font color="blue">splitAllowed</font>=<b><font color="green">Y</font></b> tells <i>CodeGen</i> the <b>split</b> option can be
+   used (i.e. multi-record-type files are allowed).</li>
+</ul>
+<p>As well as generating <b>Velocity Template</b> for the Schema (Cobol Copybook), you can generate a
+<b>Velocity Template</b> for each record in the copybook by adding a <font color="blue"><b>skel.index.genAt=record</b></font>:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">25 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>template</strong></font>=lineWrapperPojo/DataJR.vm
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">26 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>output</strong></font>=&amp;directory./data/Line&amp;recordSuffix.JR.java
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">27 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>genAt</strong></font>=record
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">28 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>description</strong></font>=A &quot;line wrapper&quot; class that provides get.../set... methods for the Cobol fields
+</font></pre>
+
+<p><b>Note:</b> <font color="blue">&amp;recordSuffix.</font> is replaced by the record name.
+
+
+<h3>Example of building a User Written Template</h3>
+ 
+ <p>The <font color="blue"><b>-TemplateDirectory</b></font> tag is used to
+specify where <b>User Written CodeGen Templates</b> are stored. The following example comes from <a href="CodeGenExample/userTemplates/genDTAR027_xBasic.bat">genDTAR027_xBasic.bat</a>.</p>
+<pre>
+
+  java -jar ../../lib/JRecordCodeGen.jar  ^
+              <font color="blue"><b>-TemplateDirectory  User/Written/Template/Directory ^</b></font>
+              -Template           xBasic ^
+              -Schema             DTAR027.cbl   ^
+                -FileOrganisation FixedWidth ^
+                -font             cp037 ^
+              -outputDirectory    DTAR027_xBasic
+
+
+</pre>
+
+<h3><a id="velocitySkel">Velocity Template</a></h3>
+
+<p>To learn about writing <b>Velocity Templates</b>, you need to look through the 
+<a href="Source/JRecord_CodeGen/src/net/sf/JRecord/cg/velocity">existing Templates</a> or ask me.
+<p>Velocity skeltons get 2 variable (schema / layout) level or 3 variables (record level).</p>
+
+<table border="1">
+<tr><td><b>variable</b></td><td><b>Description</b></td></tr>
+<tr><td><b>${packageId}</b></td><td>Holds the java package-id of the class. i.e
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">1 </font></span>package <font color="#9966ff">${</font><font color="#9966ff">packageId</font><font color="#9966ff">}</font>;
+</font></pre>
+</td></tr>
+<tr><td><b>${generateOptions}</b></td><td>This variable implement the <a href="Javadoc/templateApi/net/sf/JRecord/cg/details/IGenerateOptions.html">IGenerateOptions interface</a>.
+For example <b>${generateOptions.schemaDefinition}</b> retrieves the schema definition.
+<p>To loop through all the record-Types in a schema:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">19 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>( <font color="#9966ff">$r</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition.getRecords()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">20 </font></span>    public static final Record<font color="#9966ff">${</font><font color="#9966ff">r.extensionName</font><font color="#9966ff">}</font> RECORD_<font color="#9966ff">${</font><font color="#9966ff">r.constantName</font><font color="#9966ff">}</font> = new Record<font color="#9966ff">${</font><font color="#9966ff">r.extensionName</font><font color="#9966ff">}</font>();
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">21 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>    
+</font></pre>
+</p>
+<p>To loop through all the fields in every record Record:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">23 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>( <font color="#9966ff">$r</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition.getRecords()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">24 </font></span>    public static class Record<font color="#9966ff">${</font><font color="#9966ff">r.extensionName</font><font color="#9966ff">}</font> {
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">25 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>(<font color="#9966ff">$f</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">r.getFields()</font><font color="#9966ff">}</font>)        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">26 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#if</strong></font> (! <font color="#9966ff">${</font><font color="#9966ff">f.isArrayItem()</font><font color="#9966ff">}</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">27 </font></span>       public final String <font color="#9966ff">${</font><font color="#9966ff">f.javaName</font><font color="#9966ff">}</font> = <font color="#ff00cc">&quot;</font><font color="#ff00cc">${f.fieldDetail.getLookupName()}</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">28 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">29 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font> 
+</font></pre>
+</p>
+</td></tr>
+<tr><td><b>${currentRecord}</b></td><td><b>Record</b> templates also get the record being generated (${currentRecord}). Usage:
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>(<font color="#9966ff">$f</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">currentRecord.getFields()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#if</strong></font> (! <font color="#9966ff">${</font><font color="#9966ff">f.isArrayItem()</font><font color="#9966ff">}</font>)    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>    public <font color="#9966ff">${</font><font color="#9966ff">f.getJavaType()</font><font color="#9966ff">}</font> get<font color="#9966ff">${</font><font color="#9966ff">f.extensionName</font><font color="#9966ff">}</font>();
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+</font></pre>
+</td></tr>
+</table>
+<p>For all the <i>schema details</i> (LayoutDef, RecordDef, FieldDef)
+extend <a href="Javadoc/templateApi/net/sf/JRecord/cg/schema/JavaDetails.html">JavaDetails</a>  
+They have the following methods available</p>
+
+<table border="1">
+<tr><td><b>getCobolName()</b> or <b>cobolName</b></td><td>Get the cobol name e.g. "<b><i>My-Field-Name</i></b>"</td></tr>
+<tr><td><b>getConstantName()</b> or <b>constantName</b></td><td>Get the cobol name e.g. "<b><i>MY_FIELD_NAME</i></b>"</td></tr>
+<tr><td><b>getClassName()</b> or <b>className</b></td><td>valid Class name e.g. "<b><i>MyFieldName</i></b>"</td></tr>
+<tr><td><b>getExtensionName()</b> or <b>extensionName</b></td><td>Camel-Case name e.g. "<b><i>MyFieldName</i></b>"</td></tr>
+<tr><td><b>getJavaName()</b> or <b>javaName</b></td><td>Java Camel-Case name e.g. "<b><i>myFieldName</i></b>"</td></tr>
+</table>
+
+
+<h3><a id="SampleVT">Sample Velocity template</a></h3>
+<p>Putting it all together, the simple field-name skelton is:</p>
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 1 </font></span>package <font color="#9966ff">${</font><font color="#9966ff">packageId</font><font color="#9966ff">}</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 2 </font></span><font color="#ff8400">##</font><font color="#ff8400">${generateOptions.packageId}.schema;</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 3 </font></span>#incl(<font color="#ff00cc">&quot;</font><font color="#ff00cc">schema/CommentFieldName.pvm</font><font color="#ff00cc">&quot;</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 4 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066"> 5 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#006699"><strong>#set</strong></font> (<font color="#9966ff">$toAdd</font> = <font color="#ff00cc">&quot;</font><font color="#ff00cc">yes</font><font color="#ff00cc">&quot;</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 6 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>( <font color="#9966ff">$r</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition.getRecords()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 7 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#if</strong></font> (<font color="#9966ff">${</font><font color="#9966ff">r.getArrayDetailsList().size()</font><font color="#9966ff">}</font> &gt; 0)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 8 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#if</strong></font> (<font color="#9966ff">${</font><font color="#9966ff">toAdd</font><font color="#9966ff">}</font> == <font color="#ff00cc">&quot;</font><font color="#ff00cc">yes</font><font color="#ff00cc">&quot;</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000"> 9 </font></span>import net.sf.JRecord.cgen.impl.ArrayFieldName;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">10 </font></span>import net.sf.JRecord.cgen.def.*;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">11 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#006699"><strong>#set</strong></font> (<font color="#9966ff">$toAdd</font> = <font color="#ff00cc">&quot;</font><font color="#ff00cc">no</font><font color="#ff00cc">&quot;</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">15 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">16 </font></span>public class FieldNames<font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition.extensionName</font><font color="#9966ff">}</font> {
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">17 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">18 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#006699"><strong>#set</strong></font> (<font color="#9966ff">$schemaDef</font> = <font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition</font><font color="#9966ff">}</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">19 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>( <font color="#9966ff">$r</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition.getRecords()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">20 </font></span>    public static final Record<font color="#9966ff">${</font><font color="#9966ff">r.extensionName</font><font color="#9966ff">}</font> RECORD_<font color="#9966ff">${</font><font color="#9966ff">r.constantName</font><font color="#9966ff">}</font> = new Record<font color="#9966ff">${</font><font color="#9966ff">r.extensionName</font><font color="#9966ff">}</font>();
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">21 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">22 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">23 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>( <font color="#9966ff">$r</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">generateOptions.schemaDefinition.getRecords()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">24 </font></span>    public static class Record<font color="#9966ff">${</font><font color="#9966ff">r.extensionName</font><font color="#9966ff">}</font> {
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">25 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>(<font color="#9966ff">$f</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">r.getFields()</font><font color="#9966ff">}</font>)        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">26 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#if</strong></font> (! <font color="#9966ff">${</font><font color="#9966ff">f.isArrayItem()</font><font color="#9966ff">}</font>)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">27 </font></span>       public final String <font color="#9966ff">${</font><font color="#9966ff">f.javaName</font><font color="#9966ff">}</font> = <font color="#ff00cc">&quot;</font><font color="#ff00cc">${f.fieldDetail.getLookupName()}</font><font color="#ff00cc">&quot;</font>;
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">28 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">29 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font> 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">30 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#if</strong></font> (<font color="#9966ff">${</font><font color="#9966ff">r.getArrayDetailsList().size()</font><font color="#9966ff">}</font> &gt; 0)
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">31 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">32 </font></span>   // Array fields follow:      
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">33 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">34 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#foreach</strong></font>(<font color="#9966ff">$a</font> <font color="#0099ff"><strong>in</strong></font> <font color="#9966ff">${</font><font color="#9966ff">r.getArrayDetailsList()</font><font color="#9966ff">}</font>) 
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">35 </font></span>       public final IFieldName<font color="#9966ff">${</font><font color="#9966ff">a.getDimensionString()</font><font color="#9966ff">}</font>Dimension <font color="#9966ff">${</font><font color="#9966ff">a.getFirstElement().javaName</font><font color="#9966ff">}</font> <font color="#cc0000">#*</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">36 </font></span><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font> = new ArrayFieldName(<font color="#ff00cc">&quot;</font><font color="#ff00cc">${a.getFirstElement().cobolName}</font><font color="#ff00cc">&quot;</font>);
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">37 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">38 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">39 </font></span>        
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">40 </font></span>    }
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">41 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">42 </font></span>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">43 </font></span><font color="#cc0000">#*</font><font color="#cc0000"> </font><font color="#cc0000"> </font><font color="#cc0000">*#</font><font color="#0099ff"><strong>#end</strong></font>    
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">44 </font></span>}
+</font></pre>
+
+<h2><a id="Parameters">CodeGen Batch Parameters</a></h2>
+
+<pre>
+
+Program Options:                                       
+    <font color="blue"><b>-TemplateDirectory:</b></font> directory where user written templates are
+    <font color="blue"><b>-Template:</b></font>          Which template to generate
+            <b>basic       -</b> Generate example code using JRecord IO Builders
+            <b>standard    -</b> Generate example code using JRecord IO Builders + Field Name Class
+            <b>schemaClass -</b> Generate example code using JRecord IO Builders + Schema details   
+            <b>pojo        -</b> Generate pojo classes for each Cobol Record + IoBuilder
+            <b>javaPojo    -</b> Generate java classes for each Cobol Record
+            <b>pojoWithInterface -</b> Generate pojo classes (with interfaces) for each Cobol Record + IoBuilder
+    <font color="blue"><b>-Schema:</b></font>            Cobol copybook/Xml schema to generate code for
+    <font color="blue"><b>-package:</b></font>           Java Package Id
+    <font color="blue"><b>-loadSchema:</b></font>        Wether to generate a Schema (LayoutDetail) class or not
+           <b>inLine       -</b> Create a SchemaClass in code
+           <b>fromFile     -</b> Reload schema's from a file
+           <b>both         -</b> Do both, create schema class and allow user to read from a file
+    <font color="blue"><b>-FileOrganisation:</b></font>  What sort of file will be read ???
+           <b>Text         -</b> Standard Windows/Unix text file (single byte characterset)
+           <b>FixedWidth   -</b> File where lines (records) are the same length no \n
+           <b>Mainframe_VB -</b> Mainframe VB, file consists of <record-length><record-data>
+    <font color="blue"><b>-split:</b></font>             How to split the copybook up
+           <b>None         -</b> No Copybook split
+           <b>01           -</b> Split on 01
+           <b>redefine     -</b> Split on redefine
+           <b>highest      -</b> Hightest Level
+    <font color="blue"><b>-font:</b></font>              Font (characterset name
+    <font color="blue"><b>-DropCopybookName:</b></font>  Whether to Drop the copybook name from the start of field names
+    <font color="blue"><b>-loadSchema:</b></font>        Wether to generate a Schema (LayoutDetail) class or not
+           <b>inLine       -</b> Create a SchemaClass in code
+           <b>fromFile     -</b> Reload schema's from a file
+           <b>both         -</b> Do both, create schema class and allow user to read from a file
+    <!--font color="blue"><b>-Generate:</b></font>          Which skeltons to generate, for template=javaPojo:
+           <b>bean         -</b> Generate Java "bean" class
+           <b>imutable     -</b> Generate Imutable class-->
+    <font color="blue"><b>-output</b>Directory:</b></font>   Output directory
+
+    <font color="blue"><b>-h -?:</b></font>              List options 
+</pre>
+
+ 
+<h2><a id="changes">Changes</a></h2>
+<h3>Version 0.93</h3>
+<ul>
+  <li>Add Code to work out encoding (font), File Organization and Record-Decider 
+  from a sample data file.</li>
+  <li>Added option to rename duplicate field names in the generated code (setRenameDuplicateFields method).()
+  <li>Added option to write sample Java CodeGen call. This allows you to convert
+  existing batch CodeGen calls to java calls and expand any derived fields in java calls.
+</ul>
+<h3>Version 0.90.5</h3>
+<ul>
+	<li>Introducing a java interface (alternative to the batch interface). Going forward the java interface will
+	be the preferred method of interfacing with <b>CodeGen</b>. The <b>CodeGenInterface</b> class as the main interface class to CodeGen.</li>
+    <li>A new <i>Schema Walker</i> interface introduced to CodeGen
+    <li>Option to determine file options from a sample data file.</li>
+    <li>Support of Cobol Occurs depending on clause in lineWraper and pojo templates</li>
+	<li>Updates for the latest version of JRecord (0.95)</li> 
+	<li>Option to try and determine file attributes from a sample data file.</li>
+	<li>Add limited support to <i>RecordDecider</i> options.</li>
+	<li>Option to generate a java Codegen generate program. Uses include<ul>
+	  <li>Convert existing CodeGen batch calls to the new java interface.</li>
+	  <li>Create CodeGen java call from the <a href="https://sourceforge.net/projects/record-editor/">RecordEditor</a> 
+	  and <a href="https://sourceforge.net/projects/recsveditor/">ReCsvEditor</a>.</li>
+	  <li>Create a standalone CodeGen call when using file-Analysis options.</li>
+	</ul>
+	<li>Improve/add comments to the generated Java~JRecord code</li>
+</ul>
+
+<h3>Version 0.90.2</h3>
+<ul>
+	<li>Changing package names of <b>def</b> to  <b>definitions</b> to avoid problems with jython.</li>
+	<li>Picking up <b>JRecord 0.90.2</b></li>
+	<li>Changes for RecordEditor (to support type selection in the RecordEditor)</li> 
+</ul>
+<h3>Version 0.90</h3>
+<ul>
+	<li>Renamed stdPojo to <b>LineWrapperPojo</b></li>
+	<li>Optermisation for Numeric fields for <b>pojo</b> template.</li>
+	<li>Fixes for arrays in <b>pojo</b> template.</li> 
+</ul>
+<h3>Version 0.81.5</h3>
+<ul>
+ <li>Added <b>pojo</b> and <b>pojoWithInterface</b> <i>Templates</i>
+</ul>
+<h3>Version 0.81.1</h3>
+<ul>
+ <li>Add <b>-TemplateDirectory</b> allowing user's to create there own templates. 
+ See <a href="#userTemplates">User Written CodeGen Templates</a> for details.
+ <li>Added <a href="#lineWrapper">Line Wrapper</a> and <a href="#lineWrapperPojo">lineWrapperPojo</a> <i>CodeGen Templates</i></li>
+ <li>CodeGen has been added to the <a href="https://sourceforge.net/projects/record-editor/">RecordEditor</a>.
+ There are details on using CodeGen in the <b>RecordEditor</b> 
+ <a href="http://record-editor.sourceforge.net/RecordEditorGenerate.htm">here</a>.</li>
+</ul>
+<h3>Version 0.81</h3>
+<p>Initial release.
+
+</body>

@@ -1,0 +1,73 @@
+<body>
+ <h2>User Written CodeGen Templates</h2>
+ <p>It is possible to write your own "Templates". In the <a href="userWrittenTemplates">userWrittenTemplates</a>
+directory there are 2 sample <i>user</i> Templates:<ul>
+<li><a href="userWrittenTemplates/xBasic">xBasic</a> - copied from the standard <i>basic</i> template.</li>
+<li><a href="userWrittenTemplates/xLineWrapper">xLineWrapper</a> - copied from the standard <i>xLineWrapper</i> template.</li>
+</ul>
+<p>These templates a simply copies of the standard <b>basic</b> and <b>lineWrapper</b> templates.
+ <h2>What is a CodeGen Template</h2>
+ <p>A <b>CodeGen Template</b> is a <b>Directory</b> holding a <a href="userWrittenTemplates/xBasic/Generate.properties">Generate.properties</a> file.
+The <a href="userWrittenTemplates/xBasic/Generate.properties">Generate.properties</a> file
+holds
+<ul>
+ <li><a href="http://velocity.apache.org/">Velocity Templates</a> to be <i>Generated</i></li>
+ <li>The output names of the Generated <b>Velocity</b> templates.</li>
+ <li>Various options related to the <i>Template</i></li>
+</ul>
+<p>A basic Template looks like:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">1 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>0</strong></font>=<font color="#ff0000">2</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">2 </font></span><font color="#cc0000">#</font><font color="#cc0000">#</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">3 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>1</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>template</strong></font>=&amp;template./exampleRead.vm
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">4 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>1</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>output</strong></font>=example/Read&amp;suffix..java
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">5 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>2</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>template</strong></font>=&amp;template./exampleWrite.vm
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">6 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>2</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>output</strong></font>=example/Write&amp;suffix..java
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">7 </font></span><font color="#cc0000">#</font><font color="#cc0000">#</font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">8 </font></span><font color="#006699"><strong>requirePackageId</strong></font>=N
+</font></pre>
+
+<p>Options include:
+<ul>
+ <li>The <font color="blue">skel.0</font>=<font color="red">2</font> tells <b>CodeGen</b>
+there are 2 <a href="http://velocity.apache.org/">Velocity Templates</a> to be <i>Generated</i></li>
+ <li>The <font color="blue">skel.1.template</font>=<b><font color="green">&amp;template./exampleRead.vm</font></b> to generate the <b>exampleRead.vm</b>
+file in the current directory.
+ <li>The <font color="blue">skel.1.output</font>=<b><font color="green">example/Read&amp;suffix..java</font></b> tells <i>CodeGen</i> the output name.
+&amp;suffix. is replaced by the Schema (or layout) name.
+  <li>The <font color="blue">requirePackageId</font>=<b><font color="green">N</font></b> tells <i>CodeGen</i> a java package-id is <b>not</b> required.
+  <li>The <font color="blue">splitAllowed</font>=<b><font color="green">Y</font></b> tells <i>CodeGen</i> the <b>split</b> option can be
+   used (i.e. multi-record-type files are allowed).
+</ul>
+<p>As well as generating <b>Velocity Template</b> for the Schema (Cobol Copybook), you can generate a
+<b>Velocity Template</b> for each record in the copybook by adding a <font color="blue"><b>skel.index.genAt=record</b></font>:
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">25 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>template</strong></font>=stdPojo/DataJR.vm
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">26 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>output</strong></font>=&amp;directory./data/Line&amp;recordSuffix.JR.java
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">27 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>genAt</strong></font>=record
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">28 </font></span><font color="#006699"><strong>skel</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>3</strong></font><font color="#006699"><strong>.</strong></font><font color="#006699"><strong>description</strong></font>=A &quot;line wrapper&quot; class that provides get.../set... methods for the Cobol fields
+</font></pre>
+
+<p><b>Note:</b> <font color="blue">&amp;recordSuffix.</font> is replaced by the record name.
+
+
+<h2>Example of building a User Written Template</h2>
+ 
+ <p>The <font color="blue"><b>-TemplateDirectory</b></font> tag is used to
+specify where <b>User Written CodeGen Templates</b> are stored. The following example comes from <a href="genDTAR027_xBasic.bat">genDTAR027_xBasic.bat</a>.</p>
+<pre>
+
+  java -jar ../../lib/JRecordCodeGen.jar  ^
+              <font color="blue"><b>-TemplateDirectory  userWrittenTemplates ^</b></font>
+              -Template           xBasic ^
+              -Schema             DTAR027.cbl   ^
+                -FileOrganisation FixedWidth ^
+                -font             cp037 ^
+              -outputDirectory    DTAR027_xBasic
+
+
+</pre>
+
+
+</body>
+

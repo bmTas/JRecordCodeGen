@@ -1,0 +1,50 @@
+package ${packageId};
+#incl("schema/CommentSchema.pvm")
+
+import ${generateOptions.packageId}.definitions.Defs${generateOptions.schemaDefinition.extensionName};
+
+#*  *##set ( $implements = "" )
+#*  *##if (${generateOptions.getTemplateDtls().getGenerateOption("skel=javaPojo/IDataSchema.vm")})
+#*      *##set ( $implements = "    implements I${generateOptions.schemaDefinition.extensionName}Schema " )
+import ${generateOptions.packageId}.definitions.I${generateOptions.schemaDefinition.extensionName}Schema;
+
+#*  *##end
+/**
+  *  This abstract class is extended by all the indivual Record Classes<ul>
+#foreach( $r in ${generateOptions.schemaDefinition.getRecords()})
+  *    <li>Line${r.extensionName}Pojo
+#end
+  * <ul>
+  *
+  *  You can use the <b>generatedRecordType</b> to get the RecordType.
+  *  To process a line read in from the file
+  * <pre>
+  *    switch (line.generatedRecordType()) {
+#foreach( $r in ${generateOptions.schemaDefinition.getRecords()})
+  *       case ${r.className} : process(line.as${r.extensionName});          break;
+#end
+  *    } 
+  * </pre>
+  */
+public abstract class Line${generateOptions.schemaDefinition.extensionName}Schema ${implements} {
+    private final Defs${generateOptions.schemaDefinition.extensionName}.Records record;
+    
+    protected Line${generateOptions.schemaDefinition.extensionName}Schema (Defs${generateOptions.schemaDefinition.extensionName}.Records record) {
+        this.record = record;
+    }
+    
+	public final Defs${generateOptions.schemaDefinition.extensionName}.Records generatedRecordType() {
+	    return record;
+	}
+	
+#foreach( $r in ${generateOptions.schemaDefinition.getRecords()})
+	/**
+	 * Return either the <b>actual Record</b> or <b>null</b>
+	 * Depending on what record this is.
+	 */
+	public Line${r.extensionName}Pojo as${r.extensionName}() {
+	    return null;
+	}
+	
+#end
+}

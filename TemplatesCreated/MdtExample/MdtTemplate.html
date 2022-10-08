@@ -1,0 +1,62 @@
+<h2>CodeGen Templates</h2>
+<p>A codeGen Template is a directory with</p>
+<ul>
+  <li><strong>Generate.properties</strong> control file
+</li>
+  <li>An Xml file listing the Velocity templates and there output names
+</li>
+  <li>One or more Velocity templates
+</li>
+</ul><h2>Mdt Template</h2>
+<p>The MDT template is for Cobol copybooks where every logical field consists of<br/>
+2 logical fields:</p>
+<ul>
+  <li>A Mdt field that indicates if the Field is present
+</li>
+  <li>The Data field
+</li>
+</ul>
+<p>So in the <em>AAA-MDT</em> is the flag indicates if the <strong>AAA</strong> is present or not</p>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">5 </font></span><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font>  <font color="#ff0000">20</font>  AAA-MDT        <font color="#006699"><strong>PIC</strong></font> X(<font color="#ff0000">01</font>).
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">6 </font></span><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font>  <font color="#ff0000">20</font>  AAA            <font color="#006699"><strong>PIC</strong></font> X(<font color="#ff0000">03</font>).
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">7 </font></span><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font>  <font color="#ff0000">20</font>  BBB-MDT        <font color="#006699"><strong>PIC</strong></font> X(<font color="#ff0000">01</font>).
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">8 </font></span><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font><font color="#cc6600"> </font>  <font color="#ff0000">20</font>  BBB            <font color="#006699"><strong>PIC</strong></font> X(<font color="#ff0000">03</font>).
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">9 </font></span>
+</font></pre>
+
+<p>The <em>Mdt Template</em> generates a "field* for each logical field.<br/>
+The above will generate</p>
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">5 </font></span>    <font color="#009966"><strong>public</strong></font> IStringField <font color="#9966ff">getAAA</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font> ... <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">6 </font></span>    <font color="#009966"><strong>public</strong></font> IStringField <font color="#9966ff">getBBB</font><font color="#000000"><strong>(</strong></font><font color="#000000"><strong>)</strong></font> <font color="#000000"><strong>{</strong></font> ... <font color="#000000"><strong>}</strong></font>
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">7 </font></span>
+</font></pre>
+
+
+<h2>Mdt Template principles</h2>
+<p>One of the principles is to keep the <em>Velocity Templates</em> as simple as possible and move as much<br/>
+code as possible into support classes.<br/>
+The Support code is in the <a href="SupportJavaSource">SupportJavaSource</a> directory</p><h2>Support Code</h2>
+<p>Some important classes</p><h2>Generating using the RecordEditor</h2>
+<ul>
+  <li>Select the <strong>Generate >>> Java JRecord code for Cobol</strong> Option
+  <p><img alt="" src="images/Mdt01.png"/></p></li>
+  <li>Select the Cobol copybook and click the <strong>Generte JRecord Button</strong>
+  <p><img alt="" src="images/Mdt02.png"/></p></li>
+  <li>Enter the directory holding the template directories. So if directory structure is<br/>
+<strong>/MyTemplates/MdtTemplate</strong> you would enter <strong>MyTemplates</strong> in this field and the <strong>MdtTemplate</strong> + any other Template directories<br/>
+in the <em>MyTemplates</em> will be listed in the Template Combo box below it.
+<p><img alt="" src="images/Mdt03.png"/></p></li>
+</ul><h2>Generating CodeGen</h2>
+<p>if you download the standalone version of <a href="https://sourceforge.net/projects/jrecord/files/jrecord_CodeGen/">CodeGen</a><br/>
+you can generate the skel using bat/shell script:</p>
+
+<pre><font color="#000000"><span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">12 </font></span>java -jar ../lib/JRecordCodeGen.jar  ^
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">13 </font></span>              -TemplateDirectory  CodeGenExample ^
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">14 </font></span>              -Template           MdfTemplate ^
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#990066">15 </font></span>              -Schema             LKSA310I_Opp101_RequestFormat.cbl  ^
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">16 </font></span>              -Package            MdfTest.code  ^
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">17 </font></span>              -outputDirectory    MdfOut
+<span style="background:#dbdbdb; border-right:solid 2px black; margin-right:5px; "><font color="#000000">18 </font></span>
+</font></pre>
+
